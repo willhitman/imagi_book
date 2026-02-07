@@ -229,12 +229,33 @@ class GeminiService {
     throw Exception("Path challenge failed");
   }
 
-  Future<Uint8List> generateSpeech(String text) async {
+  Future<String?> defineWord(
+    String word,
+    String context,
+    AgeGroup ageGroup,
+  ) async {
+    final model = GenerativeModel(model: "gemini-2.5-flash", apiKey: _apiKey);
+
+    final prompt =
+        '''Define the word "$word" for a child aged ${ageGroup == AgeGroup.KIDS ? "5-8" : "9-12"}.
+        Context: "$context".
+        Keep it short (1-2 sentences) and simple to understand.''';
+
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
+      return response.text;
+    } catch (e) {
+      debugPrint("Error defining word: $e");
+      return null;
+    }
+  }
+
+  Future<Uint8List?> generateSpeech(String text) async {
     // Placeholder: Return empty or mock
     // Real implementation requires sending correct payload to TTS endpoint
     // google_generative_ai currently doesn't expose responseModalities: [AUDIO] easily in high level.
-    // Returning empty bytes for now to prevent crash.
+    // Returning null to signal fallback to local TTS.
     // In real app, would use http package to call the REST API.
-    return Uint8List(0);
+    return null;
   }
 }

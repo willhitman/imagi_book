@@ -45,6 +45,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   http: ^1.6.0
   flutter_tts: ^4.2.5
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +33,10 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   bool isGeneratingNext = false;
   bool isTeachMode = false;
 
+  // Highlighting
+  int? _currentWordIndex;
+  StreamSubscription? _ttsSubscription;
+
   // Gauntlet state (Tweens)
   bool isInGauntlet = false;
   int challengeCount = 0;
@@ -59,6 +65,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   void dispose() {
     _audioPlayer.dispose();
     _ttsService.stop();
+    _ttsSubscription?.cancel();
     super.dispose();
   }
 
@@ -258,23 +265,63 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
   }
 
+  Future<bool> _checkConnectivity() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return !connectivityResult.contains(ConnectivityResult.none);
+  }
+
   void _toggleAudio() async {
     if (isPlayingAudio) {
       await _ttsService.stop();
-      setState(() => isPlayingAudio = false);
+      _ttsSubscription?.cancel();
+      _ttsSubscription = null;
+      setState(() {
+        isPlayingAudio = false;
+        _currentWordIndex = null;
+      });
       return;
     }
 
     setState(() {
       isPlayingAudio = true;
       isTeachMode = false; // Disable teach mode when reading full page
+      _currentWordIndex = null;
+    });
+
+    final hasInternet = await _checkConnectivity();
+
+    // Attempt Gemini Audio if online (Placeholder for future API support)
+    if (hasInternet) {
+      // In a real implementation:
+      // final audioBytes = await GeminiService.generateSpeech(currentPage.text);
+      // if (audioBytes != null) playAudio(bytes); return;
+      // For now, generateSpeech returns null, so we fall back directly.
+    }
+
+    final text = currentPage.text;
+    final words = text.split(' ');
+    int currentChar = 0;
+    final wordStarts = <int>[];
+    for (final word in words) {
+      wordStarts.add(currentChar);
+      currentChar += word.length + 1; // +1 for space (approximate)
+    }
+
+    _ttsSubscription = _ttsService.currentWordStartStream.listen((start) {
+      int index = 0;
+      for (int i = 0; i < wordStarts.length; i++) {
+        if (start >= wordStarts[i]) {
+          index = i;
+        } else {
+          break;
+        }
+      }
+      if (mounted && index != _currentWordIndex) {
+        setState(() => _currentWordIndex = index);
+      }
     });
 
     await _ttsService.speak(currentPage.text);
-
-    // Auto-reset state is handled in TTSService completion handler if we used a listener,
-    // but flutter_tts state mgmt can be tricky.
-    // For now, let's just assume it plays. Realtime highlighting isn't implemented yet.
   }
 
   void setIsRevealed(bool val) {
@@ -525,7 +572,9 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                 color:
                     isTeachMode
                         ? Colors.purple.withOpacity(0.05)
-                        : Colors.transparent,
+                        : (index == _currentWordIndex
+                            ? AppColors.kidPink.withOpacity(0.2)
+                            : Colors.transparent),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -533,7 +582,10 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                 style: GoogleFonts.comicNeue(
                   fontSize: 32,
                   height: 1.5,
-                  color: Colors.black87,
+                  color:
+                      index == _currentWordIndex
+                          ? AppColors.kidPink
+                          : Colors.black87,
                   fontWeight: isTeachMode ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -567,6 +619,30 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   void _speakWord(String word) async {
+    final hasInternet = await _checkConnectivity();
+
+    if (hasInternet) {
+      try {
+        final geminiService = Provider.of<GeminiService>(
+          context,
+          listen: false,
+        );
+        // Provide visual feedback? ideally show a loading spinner or toast.
+        // For now, simpler implementation:
+        final definition = await geminiService.defineWord(
+          word,
+          currentPage.text,
+          story.ageGroup,
+        );
+
+        if (definition != null && mounted) {
+          await _ttsService.speak(definition);
+          return;
+        }
+      } catch (e) {
+        debugPrint("Error fetching definition: $e");
+      }
+    }
     await _ttsService.speak(word);
   }
 
