@@ -14,3 +14,18 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+## Configuration
+
+This project uses `flutter_dotenv` to manage environment variables.
+
+1. Create a file named `.env` in the root directory of the project.
+2. Add your Gemini API key to the file:
+
+```
+API_KEY=your_api_key_here
+```
+
+**Note:** The `.env` file is gitignored to protect your API keys. Do not commit it to version control.
+ 
