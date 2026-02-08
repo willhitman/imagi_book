@@ -18,9 +18,9 @@ class GeminiService {
   // Uncomment the line you wish to use.
   // static const String _mainModel = 'gemini-1.5-pro'; // Standard Pro model
   // static const String _mainModel = 'gemini-1.5-flash'; // Faster, cheaper
-  // static const String _mainModel = 'gemini-3.0-pro-exp'; // FUTURE: 3.0 Pro Experimental
-  static const String _mainModel =
-      'gemini-1.5-pro'; // Defaulting to 1.5 Pro as "current best"
+  static const String _mainModel = 'gemini-3.0-pro-exp'; // FUTURE: 3.0 Pro Experimental
+  // static const String _mainModel =
+  //     'gemini-1.5-pro'; // Defaulting to 1.5 Pro as "current best"
 
   // For image generation (Flash is typically better/faster for this or specialized)
   static const String _imageModel = 'gemini-1.5-flash';
