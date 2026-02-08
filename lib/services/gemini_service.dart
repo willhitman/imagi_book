@@ -14,10 +14,21 @@ class GeminiService {
 
   GeminiService.withKey(this._apiKey);
 
+  // --- Model Configuration ---
+  // Uncomment the line you wish to use.
+  // static const String _mainModel = 'gemini-1.5-pro'; // Standard Pro model
+  // static const String _mainModel = 'gemini-1.5-flash'; // Faster, cheaper
+  // static const String _mainModel = 'gemini-3.0-pro-exp'; // FUTURE: 3.0 Pro Experimental
+  static const String _mainModel =
+      'gemini-1.5-pro'; // Defaulting to 1.5 Pro as "current best"
+
+  // For image generation (Flash is typically better/faster for this or specialized)
+  static const String _imageModel = 'gemini-1.5-flash';
+
   Future<String> generateImage(String prompt) async {
     try {
       final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=$_apiKey',
+        'https://generativelanguage.googleapis.com/v1beta/models/$_imageModel:generateContent?key=$_apiKey',
       );
       final response = await http.post(
         url,
@@ -63,8 +74,8 @@ class GeminiService {
     int count, {
     String? previousContext,
   }) async {
-    final modelName =
-        ageGroup == AgeGroup.TWEENS ? "gemini-2.5-pro" : "gemini-2.5-flash";
+    // Override model for Tweens if needed, or use main model
+    final modelName = _mainModel;
     final model = GenerativeModel(
       model: modelName,
       apiKey: _apiKey,
@@ -134,7 +145,7 @@ class GeminiService {
         isSciFi ? GameType.SCIENCE : types[Random().nextInt(types.length)];
 
     final model = GenerativeModel(
-      model: "gemini-2.5-flash",
+      model: _mainModel,
       apiKey: _apiKey,
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
@@ -187,7 +198,7 @@ class GeminiService {
     int challengeIndex,
   ) async {
     final model = GenerativeModel(
-      model: "gemini-2.5-flash",
+      model: _mainModel,
       apiKey: _apiKey,
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
@@ -229,21 +240,39 @@ class GeminiService {
     throw Exception("Path challenge failed");
   }
 
-  Future<String?> defineWord(
+  Future<Map<String, String>?> defineWord(
     String word,
     String context,
     AgeGroup ageGroup,
   ) async {
-    final model = GenerativeModel(model: "gemini-2.5-flash", apiKey: _apiKey);
+    final model = GenerativeModel(
+      model: _mainModel,
+      apiKey: _apiKey,
+      generationConfig: GenerationConfig(responseMimeType: "application/json"),
+    );
 
     final prompt =
-        '''Define the word "$word" for a child aged ${ageGroup == AgeGroup.KIDS ? "5-8" : "9-12"}.
-        Context: "$context".
-        Keep it short (1-2 sentences) and simple to understand.''';
+        '''Define the word "$word" for a ${ageGroup == AgeGroup.KIDS ? "child (5-8)" : "tween (9-12)"}.
+        Context from story: "$context".
+        
+        Return a JSON object with these exact keys:
+        {
+          "definition": "Simple definition of the word.",
+          "context_meaning": "How this word is used in the specific story context.",
+          "real_world_example": "A short, relatable real-world example of using this word."
+        }
+        Keep it concise and age-appropriate.''';
 
     try {
       final response = await model.generateContent([Content.text(prompt)]);
-      return response.text;
+      if (response.text == null) return null;
+
+      final json = jsonDecode(response.text!);
+      return {
+        "definition": json["definition"]?.toString() ?? "Definition not found.",
+        "context_meaning": json["context_meaning"]?.toString() ?? "",
+        "real_world_example": json["real_world_example"]?.toString() ?? "",
+      };
     } catch (e) {
       debugPrint("Error defining word: $e");
       return null;

@@ -619,30 +619,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   void _speakWord(String word) async {
-    final hasInternet = await _checkConnectivity();
-
-    if (hasInternet) {
-      try {
-        final geminiService = Provider.of<GeminiService>(
-          context,
-          listen: false,
-        );
-        // Provide visual feedback? ideally show a loading spinner or toast.
-        // For now, simpler implementation:
-        final definition = await geminiService.defineWord(
-          word,
-          currentPage.text,
-          story.ageGroup,
-        );
-
-        if (definition != null && mounted) {
-          await _ttsService.speak(definition);
-          return;
-        }
-      } catch (e) {
-        debugPrint("Error fetching definition: $e");
-      }
-    }
+    // For Kids: Just speak the word immediately for reinforcement
     await _ttsService.speak(word);
   }
 
@@ -926,10 +903,9 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  currentPage.text,
-                  style: GoogleFonts.comicNeue(fontSize: 24, height: 1.5),
-                ),
+                // NEW: Interactive Text for Tweens (similar to Kids but different styling)
+                _buildInteractiveTweenText(),
+
                 if (isRevealed) ...[
                   const SizedBox(height: 24),
                   AspectRatio(
@@ -1071,6 +1047,125 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildInteractiveTweenText() {
+    final words = currentPage.text.split(' ');
+
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children:
+          words.map((word) {
+            final cleanWord = word.replaceAll(RegExp(r'[^\w\s]'), '');
+            return GestureDetector(
+              onTap: () => _handleTweenWordTap(cleanWord),
+              child: Text(
+                word,
+                style: GoogleFonts.comicNeue(
+                  fontSize: 24,
+                  height: 1.5,
+                  color: Colors.black87,
+                ),
+              ),
+            );
+          }).toList(),
+    );
+  }
+
+  void _handleTweenWordTap(String word) async {
+    final hasInternet = await _checkConnectivity();
+    if (!hasInternet) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Connect to internet for definitions!")),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final gemini = Provider.of<GeminiService>(context, listen: false);
+      final definitionData = await gemini.defineWord(
+        word,
+        currentPage.text,
+        story.ageGroup,
+      );
+
+      if (mounted) {
+        Navigator.pop(context); // Close loader
+        if (definitionData != null) {
+          _showDefinitionDialog(word, definitionData);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Could not define word.")),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  void _showDefinitionDialog(String word, Map<String, String> data) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              word,
+              style: GoogleFonts.comicNeue(fontWeight: FontWeight.bold),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildDefSection("Definition", data["definition"]!),
+                  const SizedBox(height: 12),
+                  _buildDefSection("Story Context", data["context_meaning"]!),
+                  const SizedBox(height: 12),
+                  _buildDefSection("Real World", data["real_world_example"]!),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  // Speak the full definition
+                  final textToSpeak =
+                      "${data['definition']} ${data['context_meaning']}";
+                  _ttsService.speak(textToSpeak);
+                },
+                icon: const Icon(Icons.volume_up),
+                label: const Text("Listen"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Close"),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget _buildDefSection(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.indigo,
+          ),
+        ),
+        Text(content, style: const TextStyle(fontSize: 16)),
+      ],
     );
   }
 }
