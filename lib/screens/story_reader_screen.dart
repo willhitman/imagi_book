@@ -1143,10 +1143,30 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     );
   }
 
+  String _cleanNavigationText(String text) {
+    var clean = text;
+    // Remove "If you..., TURN TO PAGE X." (conditional navigation)
+    clean = clean.replaceAll(
+      RegExp(
+        r'If you[^.]*TURN TO PAGE \d+.*',
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      '',
+    );
+    // Remove "TURN TO PAGE X..." (direct navigation)
+    clean = clean.replaceAll(
+      RegExp(r'TURN TO PAGE \d+.*', caseSensitive: false, dotAll: true),
+      '',
+    );
+    return clean.trim();
+  }
+
   Widget _buildInteractiveTweenText() {
+    final displayText = _cleanNavigationText(currentPage.text);
     // Regex to split text into words, whitespace (including newlines), and punctuation
     final regex = RegExp(r'(\s+|[^\s\w]+|\w+)');
-    final matches = regex.allMatches(currentPage.text);
+    final matches = regex.allMatches(displayText);
 
     return SelectableText.rich(
       TextSpan(
