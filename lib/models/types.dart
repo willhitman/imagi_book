@@ -2,7 +2,7 @@ enum AgeGroup { KIDS, TWEENS }
 
 enum Genre { FAIRY, SCIFI, MYSTERY, ADVENTURE }
 
-enum GameType { MATCHING, RUNNER, PUZZLE, BATTLE, SCIENCE, SUGGESTION }
+enum GameType { SUGGESTION }
 
 enum ChoicePath { CLASSICAL, SHADOW, ENCHANTED }
 
@@ -66,7 +66,7 @@ class GameChoice {
   };
 }
 
-class GameChallenge {
+class StoryChallenge {
   final String id;
   final String prompt;
   final List<GameChoice> choices;
@@ -74,7 +74,7 @@ class GameChallenge {
   final String hint;
   final Map<String, dynamic>? config;
 
-  GameChallenge({
+  StoryChallenge({
     required this.id,
     required this.prompt,
     required this.choices,
@@ -83,8 +83,8 @@ class GameChallenge {
     this.config,
   });
 
-  factory GameChallenge.fromJson(Map<String, dynamic> json) {
-    return GameChallenge(
+  factory StoryChallenge.fromJson(Map<String, dynamic> json) {
+    return StoryChallenge(
       id: json['id'] ?? '',
       prompt: json['prompt'] ?? '',
       choices:

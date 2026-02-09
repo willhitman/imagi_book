@@ -46,6 +46,7 @@ dependencies:
   http: ^1.6.0
   flutter_tts: ^4.2.5
   connectivity_plus: ^7.0.0
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,8 @@ flutter:
 
   assets:
     - .env
+    - assets/default_stories/
+    - assets/story_prompts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

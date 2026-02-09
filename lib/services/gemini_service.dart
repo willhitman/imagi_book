@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math'; // Added for Random
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/types.dart';
-import '../story_prompts/templates.dart';
 
 class GeminiService {
   final String _apiKey;
@@ -17,13 +17,11 @@ class GeminiService {
   // --- Model Configuration ---
   // Uncomment the line you wish to use.
   // static const String _mainModel = 'gemini-1.5-pro'; // Standard Pro model
-  // static const String _mainModel = 'gemini-1.5-flash'; // Faster, cheaper
-  static const String _mainModel = 'gemini-3.0-pro-exp'; // FUTURE: 3.0 Pro Experimental
-  // static const String _mainModel =
-  //     'gemini-1.5-pro'; // Defaulting to 1.5 Pro as "current best"
+  // static const String _mainModel = 'gemini-3-flash-preview'; // Faster, cheaper
+  static const String _mainModel = 'gemini-3-flash-preview';
 
   // For image generation (Flash is typically better/faster for this or specialized)
-  static const String _imageModel = 'gemini-1.5-flash';
+  static const String _imageModel = 'gemini-2.5-flash-lite';
 
   Future<String> generateImage(String prompt) async {
     try {
@@ -94,32 +92,78 @@ class GeminiService {
     );
 
     String promptText;
-    if (ageGroup == AgeGroup.TWEENS && previousContext == null) {
-      // First segment for TWEENS: Use the detailed template
-      promptText = '''
-        Using the following template, write the FIRST 5 pages of a story titled "$title".
-        
-        TEMPLATE:
-        $STORY_TEMPLATE
-        
-        INSTRUCTIONS:
-        - Follow the template structure for Section 1.
-        - Output the first 5 pages using the template's logic but formatted as the requested JSON array.
-        - Ensure choices are clear at the end of relevant pages.
-        - Provide a descriptive image prompt for each page.
-      ''';
+    if (ageGroup == AgeGroup.TWEENS) {
+      String template = "";
+      try {
+        template = await rootBundle.loadString(
+          'assets/story_prompts/story_template.txt',
+        );
+      } catch (e) {
+        debugPrint("Error loading story template: $e");
+        template = "[Use standard mystery/sci-fi structure]";
+      }
+
+      if (previousContext == null) {
+        // First segment for TWEENS
+        promptText = '''
+          You are a professional author writing a long-form interactive story for tweens (9-12).
+          
+          STORY TEMPLATE / GUIDELINES:
+          $template
+
+          TASK:
+          Write the FIRST $count pages of the story titled "$title".
+          Follow the "SECTION 1: THE SETUP" guidelines from the template.
+          CRITICAL: Do NOT include any options or choices at the end. The choice will be presented separately.
+          End the segment at a cliiffhanger or decision point.
+          
+          OUTPUT FORMAT:
+          Formatted as a JSON array of objects with 'text' and 'imagePrompt' fields.
+          Each page should be 3-5 sentences.
+          Ensure the style matches the "Tone" detailed in the template.
+        ''';
+      } else {
+        // Continuation for TWEENS
+        promptText = '''
+          You are continuing a long-form interactive story for tweens (9-12).
+          
+          STORY TEMPLATE / GUIDELINES:
+          $template
+
+          CONTEXT SO FAR: 
+          $previousContext
+
+          TASK:
+          Write the NEXT $count pages.
+          Continue the narrative arc defined in the template sections.
+          CRITICAL: Do NOT include any options or choices at the end. The choice will be presented separately.
+          End the segment at a cliiffhanger or decision point.
+          
+          OUTPUT FORMAT:
+          JSON array of objects with 'text' and 'imagePrompt'.
+          Each page 3-5 sentences.
+        ''';
+      }
     } else {
-      promptText =
-          previousContext != null
-              ? '''Continue the story "$title" for ages 9+.
-           CONTEXT SO FAR: $previousContext
-           Write the FINAL 5 pages. Each page 4-6 sentences.
-           Ensure a satisfying conclusion based on the path chosen.
-           Provide a descriptive image prompt for each page.'''
-              : '''Write the FIRST 5 pages of a story titled "$title" for ages 5-8.
-           Genre: Classic Fairytale adventure.
-           Each page: 2-3 sentences.
-           Provide a descriptive image prompt for each page.''';
+      // KIDS
+      if (previousContext == null) {
+        promptText = '''
+          Write a children's story titled "$title". 
+          It should be suitable for ages 5-8. 
+          Write the FIRST $count pages.
+          Each page should have simple, readable text (2-3 sentences max).
+          Provide a detailed image prompt for each page that describes a single, beautiful scene for an animation.
+          Format as a JSON array of objects with 'text' and 'imagePrompt' fields.
+        ''';
+      } else {
+        promptText = '''
+          Continue the children's story "$title".
+          CONTEXT SO FAR: $previousContext
+          Write the NEXT $count pages. Each page 2-3 sentences.
+          Provide a detailed image prompt for each page.
+          Format as a JSON array of objects with 'text' and 'imagePrompt' fields.
+        ''';
+      }
     }
 
     final response = await model.generateContent([Content.text(promptText)]);
@@ -131,71 +175,9 @@ class GeminiService {
     throw Exception("Story generation failed");
   }
 
-  Future<GameChallenge> generateGameChallenge(
-    String title,
-    String currentText,
-    AgeGroup ageGroup,
-  ) async {
-    final types =
-        GameType.values.where((t) => t != GameType.SUGGESTION).toList();
-    final isSciFi =
-        title.toLowerCase().contains('neon') ||
-        title.toLowerCase().contains('project');
-    final selectedType =
-        isSciFi ? GameType.SCIENCE : types[Random().nextInt(types.length)];
-
-    final model = GenerativeModel(
-      model: _mainModel,
-      apiKey: _apiKey,
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: Schema.object(
-          properties: {
-            'type': Schema.string(),
-            'prompt': Schema.string(),
-            'hint': Schema.string(),
-            'config': Schema.object(properties: {}), // Open object
-            'choices': Schema.array(
-              items: Schema.object(
-                properties: {
-                  'text': Schema.string(),
-                  'outcome': Schema.string(),
-                  'path': Schema.string(),
-                },
-                requiredProperties: ['text', 'outcome', 'path'],
-              ),
-            ),
-          },
-          requiredProperties: ['type', 'prompt', 'choices', 'hint', 'config'],
-        ),
-      ),
-    );
-
-    final prompt =
-        '''Based on the story "$title" and context: "$currentText", create a ${selectedType.name} interactive challenge.
-      - MATCHING: pairs (e.g. slipper-pumpkin).
-      - RUNNER: character running from something.
-      - PUZZLE: 4 segments of a key item.
-      - BATTLE: boss fight with power-ups.
-      - SCIENCE: mixing elements for sci-fi.
-      Provide configuration (config) for the chosen game.''';
-
-    final response = await model.generateContent([Content.text(prompt)]);
-
-    if (response.text != null) {
-      final json = jsonDecode(response.text!);
-      return GameChallenge.fromJson({
-        'id': Random().nextDouble().toString(),
-        ...json,
-      });
-    }
-    throw Exception("Game generation failed");
-  }
-
-  Future<GameChallenge> generatePathChallenge(
+  Future<StoryChallenge> generateStoryChoice(
     String title,
     String currentSummary,
-    int challengeIndex,
   ) async {
     final model = GenerativeModel(
       model: _mainModel,
@@ -223,21 +205,22 @@ class GeminiService {
     );
 
     final prompt =
-        '''Create Challenge #${challengeIndex + 1} of 5 for story "$title".
-    Choices: 1. CLASSICAL (Traditional) 2. SHADOW (Dark/Mysterious) 3. ENCHANTED (Magical).''';
+        '''Based on the story "$title" and the current situation: "$currentSummary", provide the next major choice for the protagonist.
+        Provide 2-3 distinct options that will steer the story in different directions.
+        For 'path', use labels like 'PATH_A', 'PATH_B', 'PATH_C' or descriptive keywords.''';
 
     final response = await model.generateContent([Content.text(prompt)]);
-    debugPrint("Path Challenge Response: ${response.text}");
+    debugPrint("Story Choice Response: ${response.text}");
 
     if (response.text != null) {
       final json = jsonDecode(response.text!);
-      return GameChallenge.fromJson({
+      return StoryChallenge.fromJson({
         'id': Random().nextDouble().toString(),
         ...json,
         'type': 'SUGGESTION',
       });
     }
-    throw Exception("Path challenge failed");
+    throw Exception("Story choice generation failed");
   }
 
   Future<Map<String, String>?> defineWord(

@@ -1,0 +1,373 @@
+[
+  {
+    "id": "default_cinderella",
+    "title": "Cinderella",
+    "pages": [
+      {
+        "text": "Once upon a time, there was a kind girl named Cinderella. She lived with her stepmother and two stepsisters who were very mean to her.",
+        "imagePrompt": "A sad girl cleaning a dusty room while two mean sisters laugh in the background, fairytale style, digital art.",
+        "isGenerating": false
+      },
+      {
+        "text": "One day, a letter arrived inviting everyone to a grand ball at the palace. Cinderella wanted to go, but her stepmother said no.",
+        "imagePrompt": "A royal invitation scroll on a table, with a castle in the distance, magical atmosphere.",
+        "isGenerating": false
+      },
+      {
+        "text": "Cinderella was crying in the garden when her Fairy Godmother appeared. With a wave of her wand, she turned a pumpkin into a carriage!",
+        "imagePrompt": "A magical fairy transforming a pumpkin into a glowing carriage, sparkles everywhere, night scene.",
+        "isGenerating": false
+      },
+      {
+        "text": "Using her magic, the Fairy Godmother gave Cinderella a beautiful blue dress and glass slippers. 'Be back by midnight!' she warned.",
+        "imagePrompt": "Cinderella spinning in a glowing blue gown, glass slippers sparkling, fairy godmother smiling.",
+        "isGenerating": false
+      },
+      {
+        "text": "Cinderella arrived at the ball and everyone stared. The Prince asked her to dance, and they swirled around the floor all night.",
+        "imagePrompt": "Cinderella and the Prince dancing in a grand ballroom, chandeliers glowing, people watching.",
+        "isGenerating": false
+      },
+      {
+        "text": "Suddenly, the clock struck midnight! Cinderella ran out of the palace, leaving one glass slipper behind on the stairs.",
+        "imagePrompt": "Cinderella running down palace stairs, losing a glass slipper, clock tower showing midnight.",
+        "isGenerating": false
+      },
+      {
+        "text": "The Prince searched the kingdom. He tried the slipper on every girl, but it didn't fit anyone until he found Cinderella.",
+        "imagePrompt": "The Prince kneeling to place the slipper on Cinderella's foot, it fits perfectly, stepsisters looking shocked.",
+        "isGenerating": false
+      },
+      {
+        "text": "Cinderella and the Prince were married in a beautiful ceremony. They lived happily ever after, full of kindness and love.",
+        "imagePrompt": "Wedding scene, Cinderella and Prince waving from a carriage, confetti, happy ending.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FFFF4081",
+    "ageGroup": "KIDS",
+    "isComplete": true,
+    "genre": "FAIRY"
+  },
+  {
+    "id": "default_jack",
+    "title": "Jack and the Beanstalk",
+    "pages": [
+      {
+        "text": "Jack lived with his mother. They were poor, so he sold their cow for magic beans. His mother was angry and threw them out the window.",
+        "imagePrompt": "Jack holding colorful magic beans, looking at an angry mother, cottage interior.",
+        "isGenerating": false
+      },
+      {
+        "text": "The next morning, a giant beanstalk had grown into the clouds! Jack was curious and decided to climb it.",
+        "imagePrompt": "A massive green beanstalk reaching into the clouds, Jack looking up in awe.",
+        "isGenerating": false
+      },
+      {
+        "text": "At the top, Jack found a giant's castle. He snuck inside and saw a giant eating piles of food.",
+        "imagePrompt": "Jack hiding behind a giant chair leg, giant eating at a huge table, clouds outside window.",
+        "isGenerating": false
+      },
+      {
+        "text": "Jack found a goose that laid golden eggs. He grabbed it, but the goose honked loudly!",
+        "imagePrompt": "Jack holding a white goose, golden egg on table, giant turning around suspicious.",
+        "isGenerating": false
+      },
+      {
+        "text": "The giant yelled 'Fee-fi-fo-fum!' and chased Jack. Jack ran as fast as he could back to the beanstalk.",
+        "imagePrompt": "Giant chasing Jack across the castle floor, Jack running with the goose.",
+        "isGenerating": false
+      },
+      {
+        "text": "Jack slid down the beanstalk with the giant close behind. He called to his mother to bring an axe.",
+        "imagePrompt": "Jack sliding down the green stalk, giant's boots visible at top, mother running with axe.",
+        "isGenerating": false
+      },
+      {
+        "text": "Jack reached the ground and chopped the beanstalk down. The giant fell and was never seen again.",
+        "imagePrompt": "Beanstalk falling over, large dust cloud, Jack holding the axe.",
+        "isGenerating": false
+      },
+      {
+        "text": "With the golden eggs, Jack and his mother built a nice house and lived happily ever after.",
+        "imagePrompt": "Jack and his mother happy in a new cottage, golden eggs on mantelpiece, garden in bloom.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FF4CAF50",
+    "ageGroup": "KIDS",
+    "isComplete": true,
+    "genre": "FAIRY"
+  },
+  {
+    "id": "default_pigs",
+    "title": "The Three Little Pigs",
+    "pages": [
+      {
+        "text": "Three little pigs set out to build their houses. The first pig built his house of straw because it was easy.",
+        "imagePrompt": "A pig building a house of yellow straw, sunny field, cute cartoon style.",
+        "isGenerating": false
+      },
+      {
+        "text": "The second pig built his house of sticks. It was a bit stronger. The third pig worked hard and built his house of bricks.",
+        "imagePrompt": "One pig with a stick house, another laying red bricks for a strong house.",
+        "isGenerating": false
+      },
+      {
+        "text": "A big bad wolf came. He huffed and puffed and blew down the straw house! The first pig ran to the stick house.",
+        "imagePrompt": "A wolf blowing hard at a straw house, straw flying, pig running away.",
+        "isGenerating": false
+      },
+      {
+        "text": "The wolf blew down the stick house too! Both pigs ran to their brother's brick house and locked the door.",
+        "imagePrompt": "Stick house collapsing, two pigs running towards a sturdy brick house.",
+        "isGenerating": false
+      },
+      {
+        "text": "The wolf huffed and puffed, but he could not blow down the brick house. He was very angry.",
+        "imagePrompt": "Wolf looking red and out of breath outside a brick house, pigs safe in window.",
+        "isGenerating": false
+      },
+      {
+        "text": "The wolf decided to climb down the chimney to get them. The pigs heard him on the roof.",
+        "imagePrompt": "Wolf climbing onto the roof, pigs inside pointing up at the fireplace.",
+        "isGenerating": false
+      },
+      {
+        "text": "The pigs put a pot of hot water in the fireplace. The wolf fell right into it with a splash!",
+        "imagePrompt": "Wolf falling into a pot in the fireplace, steam rising, looking surprised.",
+        "isGenerating": false
+      },
+      {
+        "text": "The wolf ran away howling and never came back. The three little pigs lived happily in the brick house.",
+        "imagePrompt": "Wolf running away over hills, three pigs high-fiving outside the brick house.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FFFFC107",
+    "ageGroup": "KIDS",
+    "isComplete": true,
+    "genre": "FAIRY"
+  },
+  {
+    "id": "default_red",
+    "title": "Little Red Riding Hood",
+    "pages": [
+      {
+        "text": "Little Red Riding Hood was taking a basket of treats to her sick grandmother. Her mother told her not to talk to strangers.",
+        "imagePrompt": "A girl in a red hood walking through a forest with a basket, sunny path, waving to mother.",
+        "isGenerating": false
+      },
+      {
+        "text": "She walked through the woods and saw beautiful flowers. She stopped to pick some, forgetting the time.",
+        "imagePrompt": "Red picking flowers in a sunlit glade, colorful butterflies.",
+        "isGenerating": false
+      },
+      {
+        "text": "Suddenly, a wolf appeared. He asked where she was going. Innocent Red told him she was going to Grandma's house.",
+        "imagePrompt": "Big wolf talking to Red on the path, looking sneaky, Red pointing down the road.",
+        "isGenerating": false
+      },
+      {
+        "text": "The wolf ran to the grandmother's house, locked her in the closet, and pretended to be her. Red arrived shortly after.",
+        "imagePrompt": "Wolf in a nightgown in bed, spectacles on nose, looking sneaky, bedroom.",
+        "isGenerating": false
+      },
+      {
+        "text": "'Grandma, what big ears you have!' said Red. 'All the better to hear you with,' said the wolf.",
+        "imagePrompt": "Red looking at the wolf in bed, wolf leaning forward with big ears visible.",
+        "isGenerating": false
+      },
+      {
+        "text": "'Grandma, what big teeth you have!' 'The better to eat you with!' The wolf jumped out of bed!",
+        "imagePrompt": "Wolf jumping out of bed, mouth open, Red looking scared, action pose.",
+        "isGenerating": false
+      },
+      {
+        "text": "A woodcutter heard the noise and burst through the door. He scared the wolf away with his axe.",
+        "imagePrompt": "Woodcutter standing in doorway with axe, wolf cowering and running to window.",
+        "isGenerating": false
+      },
+      {
+        "text": "Red let her grandmother out of the closet. They ate the treats with the woodcutter and were safe.",
+        "imagePrompt": "Red, grandmother, and woodcutter eating cake at a table, smiling, cozy room.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FF2196F3",
+    "ageGroup": "KIDS",
+    "isComplete": true,
+    "genre": "FAIRY"
+  },
+  {
+    "id": "default_vault",
+    "title": "The Whispering Vault",
+    "pages": [
+      {
+        "text": "The old bank had been closed for fifty years. Legend said a vault inside whispered secrets of the future to those brave enough to listen.",
+        "imagePrompt": "An abandoned, dusty bank lobby with a massive steel vault door in the shadows, mysterious lighting.",
+        "isGenerating": false
+      },
+      {
+        "text": "Leo and Scale climbed through a broken window. Their flashlights cut through the gloom. The air was cold and smelled of old paper.",
+        "imagePrompt": "Two kids with flashlights in a dark room, dust motes in the air, exploring.",
+        "isGenerating": false
+      },
+      {
+        "text": "They found the vault. It was slightly ajar. As they stepped closer, a soft, melodic humming filled the room.",
+        "imagePrompt": "Close up of the vault door, strange symbols glowing faintly, two kids looking awestruck.",
+        "isGenerating": false
+      },
+      {
+        "text": "Leo pushed the heavy door open. Inside, it wasn't gold, but floating orbs of swirling light.",
+        "imagePrompt": "Vault door open, blue and purple light spilling out, kids silhouetted against it.",
+        "isGenerating": false
+      },
+      {
+        "text": "One orb drifted towards Scale. She touched it and gasped. Images of a beautiful city in the clouds filled her mind.",
+        "imagePrompt": "Girl touching a glowing orb, holographic projection of a cloud city appearing.",
+        "isGenerating": false
+      },
+      {
+        "text": "Leo touched another. He saw himself in a lab coat, inventing a clean energy source. The vault showed potential.",
+        "imagePrompt": "Boy looking into an orb, reflection showing him as a scientist, glowing green energy.",
+        "isGenerating": false
+      },
+      {
+        "text": "Suddenly, the vault groaned. The vision faded. They knew they had to leave before it sealed itself.",
+        "imagePrompt": "Vault door starting to close, lights flickering, kids running towards the exit.",
+        "isGenerating": false
+      },
+      {
+        "text": "They escaped just in time. The vault didn't just whisper; it showed you who you could become if you worked hard.",
+        "imagePrompt": "Kids outside at sunrise, looking determined and hopeful, bank in background.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FF607D8B",
+    "ageGroup": "TWEENS",
+    "isComplete": true,
+    "genre": "MYSTERY"
+  },
+  {
+    "id": "default_chimera",
+    "title": "Project Chimera: Neon Breach",
+    "pages": [
+      {
+        "text": "Neo-Tokyo, 2145. Rain slicks the neon-drenched streets. Kai, a rogue hacker, just intercepted a data stream from the megacorp Chimera.",
+        "imagePrompt": "Cyberpunk city street at night, neon lights, rain, hacker with holographic interface.",
+        "isGenerating": false
+      },
+      {
+        "text": "The data wasn't just numbers. It was a map to a secret lab deep underground. Kai knew he had to investigate.",
+        "imagePrompt": "Holographic map projection in a dark room, clutter of tech, focused face of Kai.",
+        "isGenerating": false
+      },
+      {
+        "text": "He bypassed the security drones using a frequency jammer. The lab was silent, filled with tanks containing strange, glowing creatures.",
+        "imagePrompt": "Stealthy movement past drones, high-tech lab with bio-tanks, glowing blue liquid.",
+        "isGenerating": false
+      },
+      {
+        "text": "Kai hacked the terminal. Chimera was experimenting on them. 'Subject 7 requires extraction,' the screen read.",
+        "imagePrompt": "Close up of computer terminal code, reflection in Kai's visor, red alert light.",
+        "isGenerating": false
+      },
+      {
+        "text": "One creature woke up. It communicated telepathically. 'Free us,' it pleaded. Chimera wasn't creating weapons; they were imprisoning aliens.",
+        "imagePrompt": "Alien creature eye opening in a tank, Kai looking shocked, mental waves visualized.",
+        "isGenerating": false
+      },
+      {
+        "text": "Guards approached. Kai initiated the release sequence. The tanks drained and the creatures broke free.",
+        "imagePrompt": "Tanks shattering, creatures emerging, guards running in through a blast door.",
+        "isGenerating": false
+      },
+      {
+        "text": "Chaos erupted. Kai worked with the aliens to disable the guards. They were powerful allies.",
+        "imagePrompt": "Kai fighting alongside glowing aliens using tech and powers, dynamic action.",
+        "isGenerating": false
+      },
+      {
+        "text": "They escaped into the night. Kai looked at the city. The real war had just begun, but now he had friends.",
+        "imagePrompt": "Kai and aliens looking at city skyline from a rooftop, sunrise, hopeful but serious.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FF3F51B5",
+    "ageGroup": "TWEENS",
+    "isComplete": true,
+    "genre": "SCIFI"
+  }
+},
+{
+  "id": "default_room4b",
+  "title": "The Vanishing of Room 4B",
+  "pages": [
+    {
+      "text": "Page 1: The bell rang at Oak Creek Middle School, echoing through the halls. But something was wrong. Room 4B, Mr. Harrison's class, was completely empty.",
+      "imagePrompt": "A school hallway with an open door to a classroom, completely empty desks, eerie silence, dust motes dancing.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 2: Maya, the school reporter, was the first to notice. 'Where is everyone?' she asked. Her best friend Sam adjusted his glasses. 'Maybe a field trip?'",
+      "imagePrompt": "Two middle school kids standing in the doorway, one with a camera, one with glasses, looking confused.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 3: 'No trips today,' said Leo, the conspiracy theorist of the group. 'I checked the schedule. They've been erased.' He held up a blank attendance sheet.",
+      "imagePrompt": "Third kid holding up a clipboard with a blank paper, looking intense, school lockers in background.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 4: They stepped inside. A half-eaten sandwich sat on a desk. A pencil was still rolling on the floor. It was like they vanished in an instant.",
+      "imagePrompt": "Close up of a desk with a sandwich and a rolling pencil, motion blur on the pencil.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 5: On the chalkboard, a single sentence was written in hastily scrawled chalk: 'DON'T LOOK AT THE LIGHT.'",
+      "imagePrompt": "Green chalkboard with white chalk writing 'DON'T LOOK AT THE LIGHT', ominous atmosphere.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 6: 'This is barely a prank,' Sam said nervously. But then the lights in the hallway flickered. A strange, low hum began to vibrate the floor.",
+      "imagePrompt": "Kids looking up at flickering fluorescent lights, shadows stretching long and weird.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 7: 'We need to find them,' Maya said, grabbing her camera. 'Before whatever took them comes back for us.'",
+      "imagePrompt": "Maya looking determined, holding camera up, friends standing behind her ready for adventure.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 8: As they ran down the hall, the school doors slammed suspect. Locked. Note on the glass: 'Testing in Progress. Do Not Exit.'",
+      "imagePrompt": "School double doors with chains or a digital lock sign saying 'TESTING IN PROGRESS', kids banging on glass.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 9: 'My theories are starting to make sense now, aren't they?' Leo whispered. The adventure of Room 4B had just begun.",
+      "imagePrompt": "Leo smiling slightly, spooky lighting, group huddled together planning.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 10: They had three leads: The Principal's Office, the weird Boiler Room, or the Attic where the old bell tower used to be.",
+      "imagePrompt": "Split screen or montage of a fancy office door, a rusty metal boiler door, and a trapdoor to an attic.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 11: 'Let's split up,' Sam suggested. 'No!' yelled Maya and Leo together. 'That's how people go missing in movies!'",
+      "imagePrompt": "Funny moment, Maya and Leo shouting at Sam, Sam looking sheepish.",
+      "isGenerating": false
+    },
+    {
+      "text": "Page 12: They decided to stick together. First stop: The Boiler Room. Something was glowing green beneath the doorframe...",
+      "imagePrompt": "Dark hallway, green eerie glow coming from under a metal door, silhouettes of the three kids approaching.",
+      "isGenerating": false
+    }
+  ],
+  "coverColor": "FF673AB7",
+  "ageGroup": "TWEENS",
+  "isComplete": true,
+  "genre": "MYSTERY"
+}
+]

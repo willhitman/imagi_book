@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -9,7 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../models/types.dart';
 import '../services/gemini_service.dart';
 import '../services/tts_service.dart';
-import '../widgets/adventure_game_widget.dart';
+import '../widgets/story_choice_widget.dart';
 import '../theme/design_tokens.dart';
 
 class StoryReaderScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   // Gauntlet state (Tweens)
   bool isInGauntlet = false;
   int challengeCount = 0;
-  GameChallenge? activeChallenge;
+  StoryChallenge? activeChallenge;
   List<Map<String, String>> challengeOutcomes = [];
 
   // Services
@@ -120,19 +121,22 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     });
 
     // KIDS Gauntlet trigger (Page 3 / index 2) - Existing logic
+    // DISABLED per user request: Challenges should not show on kids stories.
+    /*
     if (currentPageIndex == 2 &&
         story.ageGroup == AgeGroup.KIDS &&
         challengeOutcomes.isEmpty) {
       _startGauntlet();
       return;
     }
+    */
 
-    // TWEENS Gauntlet trigger (Page 5 / index 4)
-    if (currentPageIndex == 4 &&
+    // TWEENS Choice trigger (End of current segment)
+    if (currentPageIndex == story.pages.length - 1 &&
         story.ageGroup == AgeGroup.TWEENS &&
         !story.isComplete) {
-      debugPrint("Triggering Tween Gauntlet...");
-      _startTwinGauntlet();
+      debugPrint("Triggering Story Choice...");
+      _triggerStoryChoice();
       return;
     }
 
@@ -142,6 +146,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
       });
       _checkAndGenerateImage();
     } else {
+      // End of Story -> Adventure Completed
       setState(() {
         isFinished = true;
       });
@@ -160,42 +165,25 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
   }
 
-  void _startGauntlet() async {
-    setState(() => isGeneratingNext = true);
-    try {
-      final gemini = Provider.of<GeminiService>(context, listen: false);
-      final challenge = await gemini.generateGameChallenge(
-        story.title,
-        story.pages[2].text,
-        story.ageGroup,
-      );
-      if (mounted) {
-        setState(() {
-          activeChallenge = challenge;
-          isInGauntlet = true;
-          isGeneratingNext = false;
-        });
-      }
-    } catch (e) {
-      setState(() => isGeneratingNext = false);
-    }
-  }
-
-  void _startTwinGauntlet() async {
+  void _triggerStoryChoice() async {
     setState(() => isInGauntlet = true);
-    _nextTweenChallenge();
+    _generateNextChoice();
   }
 
-  void _nextTweenChallenge() async {
+  void _generateNextChoice() async {
     setState(() => isGeneratingNext = true);
     try {
       final gemini = Provider.of<GeminiService>(context, listen: false);
-      final summary = story.pages.take(5).map((e) => e.text).join(" ");
-      final challenge = await gemini.generatePathChallenge(
-        story.title,
-        summary,
-        challengeCount,
-      );
+      // Use the last few pages as summary context
+      final summary =
+          story.pages.length > 5
+              ? story.pages
+                  .sublist(story.pages.length - 5)
+                  .map((e) => e.text)
+                  .join(" ")
+              : story.pages.map((e) => e.text).join(" ");
+
+      final challenge = await gemini.generateStoryChoice(story.title, summary);
       if (mounted) {
         setState(() {
           activeChallenge = challenge;
@@ -203,7 +191,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         });
       }
     } catch (e) {
-      debugPrint("Error generating Tween challenge: $e");
+      debugPrint("Error generating story choice: $e");
       setState(() => isGeneratingNext = false);
     }
   }
@@ -221,47 +209,50 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
       return;
     }
 
-    // TWEENS Logic
-    if (challengeCount < 4) {
-      setState(() => challengeCount++);
-      _nextTweenChallenge();
-    } else {
-      // Finish gauntlet
-      setState(() => isGeneratingNext = true);
-      try {
-        final gemini = Provider.of<GeminiService>(context, listen: false);
-        final contextStr =
-            "Chosen path events: ${challengeOutcomes.map((e) => e['outcome']).join('. ')}";
-        final finalPages = await gemini.generateStorySegment(
-          story.title,
-          story.ageGroup,
-          6,
-          5,
-          previousContext: contextStr,
-        );
+    // TWEENS Logic: Continue Story
+    setState(() => isGeneratingNext = true);
+    try {
+      final gemini = Provider.of<GeminiService>(context, listen: false);
+      final contextStr =
+          "User chose: $outcome. Previous events: ${story.pages.last.text}"; // Simplified context
 
-        if (mounted) {
-          setState(() {
-            final newPages = List<StoryPage>.from(story.pages)
-              ..addAll(finalPages);
-            story = Story(
-              id: story.id,
-              title: story.title,
-              pages: newPages,
-              coverColor: story.coverColor,
-              ageGroup: story.ageGroup,
-              genre: story.genre,
-              isComplete: true,
-            );
-            isInGauntlet = false;
-            currentPageIndex = 5;
-            isGeneratingNext = false;
-          });
-          _checkAndGenerateImage();
-        }
-      } catch (e) {
-        setState(() => isGeneratingNext = false);
+      // Generate next 12 pages
+      final nextPages = await gemini.generateStorySegment(
+        story.title,
+        story.ageGroup,
+        story.pages.length + 1,
+        12,
+        previousContext: contextStr,
+      );
+
+      if (mounted) {
+        setState(() {
+          final newPages = List<StoryPage>.from(story.pages)..addAll(nextPages);
+
+          // Check for "THE END" marker in the last page to determine completion
+          final bool nowComplete = nextPages.any(
+            (p) => p.text.toUpperCase().contains("THE END"),
+          );
+
+          story = Story(
+            id: story.id,
+            title: story.title,
+            pages: newPages,
+            coverColor: story.coverColor,
+            ageGroup: story.ageGroup,
+            genre: story.genre,
+            isComplete: nowComplete,
+          );
+          isInGauntlet = false;
+          // Move to the first page of the new segment
+          currentPageIndex = story.pages.length - nextPages.length;
+          isGeneratingNext = false;
+        });
+        _checkAndGenerateImage();
       }
+    } catch (e) {
+      debugPrint("Error generating next segment: $e");
+      setState(() => isGeneratingNext = false);
     }
   }
 
@@ -441,7 +432,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           if (isInGauntlet && activeChallenge != null)
             Container(
               color: AppColors.paper,
-              child: AdventureGameWidget(
+              child: StoryChoiceWidget(
                 challenge: activeChallenge!,
                 onComplete: _onChallengeComplete,
               ),
@@ -650,13 +641,21 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           ),
           FloatingActionButton.extended(
             heroTag: "next_btn",
-            onPressed:
+            onPressed: _handleNextPage,
+            label: Text(
+              currentPageIndex == story.pages.length - 1
+                  ? "Close Book"
+                  : "Next",
+            ),
+            icon: Icon(
+              currentPageIndex == story.pages.length - 1
+                  ? Icons.menu_book
+                  : Icons.arrow_forward,
+            ),
+            backgroundColor:
                 currentPageIndex == story.pages.length - 1
-                    ? null
-                    : _handleNextPage,
-            label: const Text("Next"),
-            icon: const Icon(Icons.arrow_forward),
-            backgroundColor: AppColors.kidBlue,
+                    ? AppColors.kidGreen
+                    : AppColors.kidBlue,
             foregroundColor: Colors.white,
           ),
         ],
@@ -810,7 +809,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                       isGeneratingNext
                           ? const Center(child: CircularProgressIndicator())
                           : isInGauntlet && activeChallenge != null
-                          ? AdventureGameWidget(
+                          ? StoryChoiceWidget(
                             challenge: activeChallenge!,
                             onComplete: _onChallengeComplete,
                           )
@@ -839,7 +838,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                           icon: const Icon(Icons.arrow_forward),
                           label: Text(
                             currentPageIndex == story.pages.length - 1
-                                ? 'Finish'
+                                ? 'Close Book'
                                 : 'Next',
                           ),
                           style: ElevatedButton.styleFrom(
@@ -985,6 +984,8 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
               ),
             ),
             const SizedBox(height: 48),
+
+            const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.book),
@@ -1053,29 +1054,31 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   Widget _buildInteractiveTweenText() {
     final words = currentPage.text.split(' ');
 
-    return Wrap(
-      spacing: 4,
-      runSpacing: 4,
-      children:
-          words.map((word) {
-            final cleanWord = word.replaceAll(RegExp(r'[^\w\s]'), '');
-            return GestureDetector(
-              onTap: () => _handleTweenWordTap(cleanWord),
-              child: Text(
-                word,
+    return SelectableText.rich(
+      TextSpan(
+        children:
+            words.map((word) {
+              final cleanWord = word.replaceAll(RegExp(r'[^\w\s]'), '');
+              return TextSpan(
+                text: "$word ",
                 style: GoogleFonts.comicNeue(
                   fontSize: 24,
                   height: 1.5,
                   color: Colors.black87,
                 ),
-              ),
-            );
-          }).toList(),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () => _handleTweenWordTap(cleanWord),
+              );
+            }).toList(),
+      ),
     );
   }
 
   void _handleTweenWordTap(String word) async {
     final hasInternet = await _checkConnectivity();
+    if (!mounted) return;
+
     if (!hasInternet) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Connect to internet for definitions!")),
