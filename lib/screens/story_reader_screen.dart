@@ -178,6 +178,14 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
 
     if (currentPageIndex < story.pages.length - 1) {
+      // If we detect "The End" early (Tweens), treat it as finished
+      if (story.ageGroup == AgeGroup.TWEENS && _isStoryEnd()) {
+        setState(() {
+          isFinished = true;
+        });
+        return;
+      }
+
       setState(() {
         currentPageIndex++;
       });
@@ -268,7 +276,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
           // Check for "THE END" marker in the last page to determine completion
           final bool nowComplete = nextPages.any(
-            (p) => p.text.toUpperCase().contains("THE END"),
+            (p) => p.text.contains("THE END"),
           );
 
           story = Story(
@@ -926,14 +934,15 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                         ),
                         ElevatedButton.icon(
                           onPressed: _handleNextPage,
-                          icon: const Icon(Icons.arrow_forward),
-                          label: Text(
-                            currentPageIndex == story.pages.length - 1
-                                ? 'Close Book'
-                                : 'Next',
+                          icon: Icon(
+                            _isStoryEnd() ? Icons.book : Icons.arrow_forward,
                           ),
+                          label: Text(_isStoryEnd() ? 'Close Book' : 'Next'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.kidBlue,
+                            backgroundColor:
+                                _isStoryEnd()
+                                    ? AppColors.kidGreen
+                                    : AppColors.kidBlue,
                             foregroundColor: Colors.white,
                           ),
                         ),
@@ -946,6 +955,12 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         ],
       ),
     );
+  }
+
+  bool _isStoryEnd() {
+    if (currentPageIndex == story.pages.length - 1) return true;
+    final text = currentPage.text;
+    return text.contains("THE END");
   }
 
   Widget _buildTweensContent() {
