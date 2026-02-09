@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
+const apiKey = "AIzaSyCeGdUkYQZ24n5B0nR2p2EeDORsxZ2Euc8";
 const ai = new GoogleGenAI({ apiKey });
 
 const VICTORY_STORIES = [

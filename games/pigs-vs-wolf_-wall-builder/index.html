@@ -1,94 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Pigs vs Wolf: Wall Builder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      body {
-        overscroll-behavior: none;
-        touch-action: none;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-      .brick-pattern {
-        background-color: #e53e3e;
-        background-image: 
-          linear-gradient(335deg, rgba(255,255,255,0.2) 23px, transparent 23px),
-          linear-gradient(155deg, rgba(255,255,255,0.2) 23px, transparent 23px),
-          linear-gradient(335deg, rgba(255,255,255,0.2) 23px, transparent 23px),
-          linear-gradient(155deg, rgba(255,255,255,0.2) 23px, transparent 23px);
-        background-size: 58px 58px;
-        background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pigs vs Wolf: Wall Builder</title>
+
+  <style>
+    body {
+      overscroll-behavior: none;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .brick-pattern {
+      background-color: #e53e3e;
+      background-image:
+        linear-gradient(335deg, rgba(255, 255, 255, 0.2) 23px, transparent 23px),
+        linear-gradient(155deg, rgba(255, 255, 255, 0.2) 23px, transparent 23px),
+        linear-gradient(335deg, rgba(255, 255, 255, 0.2) 23px, transparent 23px),
+        linear-gradient(155deg, rgba(255, 255, 255, 0.2) 23px, transparent 23px);
+      background-size: 58px 58px;
+      background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
+    }
+
+    /* Wind Animation */
+    @keyframes windFlow {
+      0% {
+        transform: translateX(0) scaleX(0.5);
+        opacity: 0;
       }
 
-      /* Wind Animation */
-      @keyframes windFlow {
-        0% { transform: translateX(0) scaleX(0.5); opacity: 0; }
-        20% { opacity: 0.8; transform: translateX(50px) scaleX(1); }
-        100% { transform: translateX(300px) scaleX(0.8); opacity: 0; }
+      20% {
+        opacity: 0.8;
+        transform: translateX(50px) scaleX(1);
       }
 
-      /* Shake Animation */
-      @keyframes shake {
-        0% { transform: translate(1px, 1px) rotate(0deg); }
-        10% { transform: translate(-1px, -2px) rotate(-1deg); }
-        20% { transform: translate(-3px, 0px) rotate(1deg); }
-        30% { transform: translate(3px, 2px) rotate(0deg); }
-        40% { transform: translate(1px, -1px) rotate(1deg); }
-        50% { transform: translate(-1px, 2px) rotate(-1deg); }
-        60% { transform: translate(-3px, 1px) rotate(0deg); }
-        70% { transform: translate(3px, 1px) rotate(-1deg); }
-        80% { transform: translate(-1px, -1px) rotate(1deg); }
-        90% { transform: translate(1px, 2px) rotate(0deg); }
-        100% { transform: translate(1px, -2px) rotate(-1deg); }
+      100% {
+        transform: translateX(300px) scaleX(0.8);
+        opacity: 0;
       }
-      .animate-shake {
-          animation: shake 0.5s infinite;
+    }
+
+    /* Shake Animation */
+    @keyframes shake {
+      0% {
+        transform: translate(1px, 1px) rotate(0deg);
       }
 
-      /* Crumble Animations */
-      @keyframes crumbleLeft {
-        0% { transform: translate(0, 0) rotate(0); opacity: 1; }
-        100% { transform: translate(-60px, 150px) rotate(-60deg); opacity: 0; }
+      10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
       }
-      @keyframes crumbleRight {
-        0% { transform: translate(0, 0) rotate(0); opacity: 1; }
-        100% { transform: translate(60px, 100px) rotate(60deg); opacity: 0; }
-      }
-      @keyframes crumbleCenter {
-        0% { transform: translate(0, 0) rotate(0); opacity: 1; }
-        100% { transform: translate(0, 50px) rotate(10deg) scale(0.8); opacity: 0; }
-      }
-      .animate-crumble-left { animation: crumbleLeft 1.5s forwards ease-in; }
-      .animate-crumble-right { animation: crumbleRight 1.5s forwards ease-in; }
-      .animate-crumble-center { animation: crumbleCenter 1.5s forwards ease-in; }
 
-      /* Blown Away Animation */
-      @keyframes blownAway {
-        0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-        100% { transform: translateX(800px) rotate(360deg); opacity: 0; }
+      20% {
+        transform: translate(-3px, 0px) rotate(1deg);
       }
-      .animate-blown-away {
-          animation: blownAway 1.5s forwards ease-in;
-          animation-delay: 0.2s;
+
+      30% {
+        transform: translate(3px, 2px) rotate(0deg);
       }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body>
-    <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+
+      40% {
+        transform: translate(1px, -1px) rotate(1deg);
+      }
+
+      50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+      }
+
+      60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+      }
+
+      70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+      }
+
+      80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+      }
+
+      90% {
+        transform: translate(1px, 2px) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+      }
+    }
+
+    .animate-shake {
+      animation: shake 0.5s infinite;
+    }
+
+    /* Crumble Animations */
+    @keyframes crumbleLeft {
+      0% {
+        transform: translate(0, 0) rotate(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-60px, 150px) rotate(-60deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes crumbleRight {
+      0% {
+        transform: translate(0, 0) rotate(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(60px, 100px) rotate(60deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes crumbleCenter {
+      0% {
+        transform: translate(0, 0) rotate(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(0, 50px) rotate(10deg) scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    .animate-crumble-left {
+      animation: crumbleLeft 1.5s forwards ease-in;
+    }
+
+    .animate-crumble-right {
+      animation: crumbleRight 1.5s forwards ease-in;
+    }
+
+    .animate-crumble-center {
+      animation: crumbleCenter 1.5s forwards ease-in;
+    }
+
+    /* Blown Away Animation */
+    @keyframes blownAway {
+      0% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateX(800px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .animate-blown-away {
+      animation: blownAway 1.5s forwards ease-in;
+      animation-delay: 0.2s;
+    }
+  </style>
+
+  <div id="root"></div>
+  <script type="module" src="./index.tsx"></script>
+  </body>
+
 </html>

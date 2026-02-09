@@ -11,48 +11,119 @@ const Basket = forwardRef<HTMLDivElement, BasketProps>(({ isHovered, inventory, 
   // Calculate total progress for visual feedback
   const totalRequired = (Object.values(required) as number[]).reduce((a, b) => a + b, 0);
   const totalCollected = (Object.values(inventory) as number[]).reduce((a, b) => a + b, 0);
-  
+
   // Cap visual fill at 100%
   const fillPercentage = totalRequired > 0 ? Math.min((totalCollected / totalRequired) * 100, 100) : 0;
 
   return (
     <div
       ref={ref}
-      className={`relative transition-all duration-300 transform ${
-        isHovered ? 'scale-110' : 'scale-100'
-      }`}
-      style={{ width: '160px', height: '140px' }}
+      style={{
+        position: 'relative',
+        transition: 'all 300ms',
+        transform: isHovered ? 'scale(1.1) translateX(-50%)' : 'scale(1) translateX(-50%)',
+        width: '160px',
+        height: '140px',
+        left: '50%'
+      }}
     >
       {/* Basket Handle (Back) */}
-      <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-32 h-24 border-8 border-amber-800 rounded-t-full z-0" />
+      <div style={{
+        position: 'absolute',
+        top: '-48px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '128px',
+        height: '96px',
+        border: '8px solid #92400e', // amber-800
+        borderRadius: '9999px 9999px 0 0',
+        zIndex: 0
+      }} />
 
       {/* Basket Body */}
-      <div className="absolute bottom-0 w-full h-24 bg-amber-600 rounded-b-3xl rounded-t-lg shadow-xl z-20 flex flex-col items-center justify-center border-b-4 border-amber-800 overflow-hidden">
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: '96px',
+        backgroundColor: '#d97706', // amber-600
+        borderRadius: '0 0 1.5rem 1.5rem',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        zIndex: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderBottom: '4px solid #92400e',
+        overflow: 'hidden'
+      }}>
         {/* Wicker Pattern Texture effect */}
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black to-transparent" />
-        
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.2,
+          background: 'radial-gradient(circle at center, black, transparent)'
+        }} />
+
         {/* Label */}
-        <span className="text-amber-100 font-bold text-lg drop-shadow-md z-30">Basket</span>
-        
+        <span style={{
+          color: '#fef3c7', // amber-100
+          fontWeight: 'bold',
+          fontSize: '1.125rem',
+          textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+          zIndex: 30
+        }}>Basket</span>
+
         {/* Mini progress bar inside basket */}
-         <div className="w-24 h-2 bg-amber-900/50 rounded-full mt-2 z-30 overflow-hidden">
-           <div 
-             className="h-full bg-green-400 transition-all duration-500"
-             style={{ width: `${fillPercentage}%` }}
-           />
-         </div>
+        <div style={{
+          width: '96px',
+          height: '8px',
+          backgroundColor: 'rgba(69, 26, 3, 0.5)', // amber-950/50
+          borderRadius: '9999px',
+          marginTop: '8px',
+          zIndex: 30,
+          overflow: 'hidden'
+        }}>
+          <div
+            style={{
+              height: '100%',
+              backgroundColor: '#4ade80', // green-400
+              transition: 'all 500ms',
+              width: `${fillPercentage}%`
+            }}
+          />
+        </div>
       </div>
 
       {/* Flowers inside visuals (simple stacking effect) */}
-      <div className="absolute bottom-16 left-4 right-4 h-8 flex justify-center items-end space-x-1 z-10">
-         {inventory[FlowerType.RED_ROSE] > 0 && <div className="w-6 h-6 rounded-full bg-red-500 shadow-sm animate-bounce" style={{ animationDuration: '2s' }} />}
-         {inventory[FlowerType.BLUE_VIOLET] > 0 && <div className="w-6 h-6 rounded-full bg-blue-500 shadow-sm animate-bounce" style={{ animationDuration: '2.5s' }} />}
-         {inventory[FlowerType.YELLOW_DAISY] > 0 && <div className="w-6 h-6 rounded-full bg-yellow-400 shadow-sm animate-bounce" style={{ animationDuration: '3s' }} />}
+      <div style={{
+        position: 'absolute',
+        bottom: '64px',
+        left: '16px',
+        right: '16px',
+        height: '32px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        gap: '4px',
+        zIndex: 10
+      }}>
+        {inventory[FlowerType.RED_ROSE] > 0 && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} />}
+        {inventory[FlowerType.BLUE_VIOLET] > 0 && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#3b82f6', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} />}
+        {inventory[FlowerType.YELLOW_DAISY] > 0 && <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#facc15', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} />}
       </div>
-      
+
       {/* Drop Zone Glow */}
       {isHovered && (
-        <div className="absolute -inset-4 border-4 border-dashed border-yellow-400 rounded-xl animate-pulse z-0 pointer-events-none" />
+        <div style={{
+          position: 'absolute',
+          inset: '-16px',
+          border: '4px dashed #facc15',
+          borderRadius: '0.75rem',
+          zIndex: 0,
+          pointerEvents: 'none',
+          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+        }} />
       )}
     </div>
   );

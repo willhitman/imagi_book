@@ -119,6 +119,8 @@ class Story {
   final AgeGroup ageGroup;
   final bool isComplete;
   final Genre genre;
+  final String? gamePath;
+  final List<String>? gamePaths;
 
   Story({
     required this.id,
@@ -128,6 +130,8 @@ class Story {
     required this.ageGroup,
     this.isComplete = false,
     required this.genre,
+    this.gamePath,
+    this.gamePaths,
   });
 
   factory Story.fromJson(Map<String, dynamic> json) {
@@ -143,6 +147,8 @@ class Story {
       ageGroup: AgeGroup.values.firstWhere((e) => e.name == json['ageGroup']),
       isComplete: json['isComplete'] ?? false,
       genre: Genre.values.firstWhere((e) => e.name == json['genre']),
+      gamePath: json['gamePath'],
+      gamePaths: (json['gamePaths'] as List?)?.map((e) => e as String).toList(),
     );
   }
 
@@ -154,5 +160,7 @@ class Story {
     'ageGroup': ageGroup.name,
     'isComplete': isComplete,
     'genre': genre.name,
+    'gamePath': gamePath,
+    'gamePaths': gamePaths,
   };
 }

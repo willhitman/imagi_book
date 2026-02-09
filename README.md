@@ -16,6 +16,14 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 
+## Building Games
+The app includes HTML5 games for specific stories. To build them:
+
+```bash
+./scripts/build_games.sh
+```
+This script installs dependencies, builds the games, and copies the output to `assets/games/`.
+
 ## Configuration
 
 This project uses `flutter_dotenv` to manage environment variables.

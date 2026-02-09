@@ -1,4 +1,4 @@
-export const GAME_DURATION = 70; // seconds
+export const GAME_DURATION = 30; // seconds
 export const TARGET_WALL_HEIGHT = 100; // percent
 export const SPAWN_INTERVAL = 800; // ms
 export const BLOCK_SIZE = 60; // px

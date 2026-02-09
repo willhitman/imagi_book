@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { 
+import {
   ROAD_WIDTH_PCT, FPS, BASE_SPEED, BOOST_SPEED, BOOST_DURATION_MS,
   FINISH_LINE_Z, HARE_START_Z, HARE_BASE_SPEED, HARE_MIN_SPEED, HARE_DECAY_RATE,
   CAMERA_OFFSET_Y, RENDER_DISTANCE, LANE_SPEED
@@ -14,7 +14,7 @@ interface RaceGameProps {
 const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
-  
+
   // Input State
   const inputRef = useRef({ left: false, right: false });
 
@@ -46,7 +46,7 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
   // Initialize Game Objects
   useEffect(() => {
     const s = state.current;
-    
+
     // Generate static powerups
     const powerUps: PowerUp[] = [];
     for (let z = 1000; z < FINISH_LINE_Z; z += 800) {
@@ -68,23 +68,23 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     for (let z = 200; z < FINISH_LINE_Z + 1500; z += 300) {
       const isNearFinish = z > FINISH_LINE_Z - 2000;
       const density = isNearFinish ? 3 : 1; // More fans near finish
-      
-      for(let i=0; i<density; i++) {
+
+      for (let i = 0; i < density; i++) {
         // Left side (-30 to -10)
         crowd.push({
-            x: -10 - Math.random() * 20,
-            z: z + Math.random() * 100,
-            color: ['#d97706', '#9ca3af', '#fca5a5'][Math.floor(Math.random()*3)], // Fox, Wolf, Pinkish
-            type: 'bear', // Placeholder for shape logic
-            jumpOffset: Math.random() * Math.PI * 2
+          x: -10 - Math.random() * 20,
+          z: z + Math.random() * 100,
+          color: ['#d97706', '#9ca3af', '#fca5a5'][Math.floor(Math.random() * 3)], // Fox, Wolf, Pinkish
+          type: 'bear', // Placeholder for shape logic
+          jumpOffset: Math.random() * Math.PI * 2
         });
         // Right side (110 to 130)
         crowd.push({
-            x: 110 + Math.random() * 20,
-            z: z + Math.random() * 100,
-            color: ['#d97706', '#9ca3af', '#fca5a5'][Math.floor(Math.random()*3)],
-            type: 'bear',
-            jumpOffset: Math.random() * Math.PI * 2
+          x: 110 + Math.random() * 20,
+          z: z + Math.random() * 100,
+          color: ['#d97706', '#9ca3af', '#fca5a5'][Math.floor(Math.random() * 3)],
+          type: 'bear',
+          jumpOffset: Math.random() * Math.PI * 2
         });
       }
     }
@@ -138,68 +138,68 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     if (s.gameOverTriggered) return;
 
     const now = Date.now();
-    
+
     // --- Race Ending Logic ---
     if (s.finishTime === 0) {
-        // Normal Race Logic
-        
-        // Player Movement
-        if (inputRef.current.left) s.playerX = Math.max(10, s.playerX - LANE_SPEED);
-        if (inputRef.current.right) s.playerX = Math.min(90, s.playerX + LANE_SPEED);
+      // Normal Race Logic
 
-        // Speed / Boost
-        const isBoosted = now < s.boostEndTime;
-        const currentTargetSpeed = isBoosted ? BOOST_SPEED : BASE_SPEED;
-        s.playerSpeed += (currentTargetSpeed - s.playerSpeed) * 0.1;
-        s.playerZ += s.playerSpeed;
+      // Player Movement
+      if (inputRef.current.left) s.playerX = Math.max(10, s.playerX - LANE_SPEED);
+      if (inputRef.current.right) s.playerX = Math.min(90, s.playerX + LANE_SPEED);
 
-        // Hare Logic
-        s.hareSpeed = Math.max(HARE_MIN_SPEED, s.hareSpeed - HARE_DECAY_RATE);
-        s.hareZ += s.hareSpeed;
+      // Speed / Boost
+      const isBoosted = now < s.boostEndTime;
+      const currentTargetSpeed = isBoosted ? BOOST_SPEED : BASE_SPEED;
+      s.playerSpeed += (currentTargetSpeed - s.playerSpeed) * 0.1;
+      s.playerZ += s.playerSpeed;
 
-        // Collision Check (Powerups)
-        s.powerUps.forEach(p => {
-          if (!p.active) return;
-          if (Math.abs(p.z - s.playerZ) < 60 && Math.abs(p.x - s.playerX) < 15) {
-            p.active = false;
-            s.boostEndTime = now + BOOST_DURATION_MS;
-            spawnParticles(window.innerWidth / 2, window.innerHeight * CAMERA_OFFSET_Y, 20, '#facc15'); 
-          }
-        });
+      // Hare Logic
+      s.hareSpeed = Math.max(HARE_MIN_SPEED, s.hareSpeed - HARE_DECAY_RATE);
+      s.hareZ += s.hareSpeed;
 
-        // Check for finish
-        if (s.playerZ >= FINISH_LINE_Z) {
-            s.finishTime = now;
-            s.didWin = true;
-            // Immediate confetti burst
-            spawnParticles(window.innerWidth/2, window.innerHeight/2, 50, '#FFD700', 0.2);
-        } else if (s.hareZ >= FINISH_LINE_Z) {
-            s.finishTime = now;
-            s.didWin = false;
+      // Collision Check (Powerups)
+      s.powerUps.forEach(p => {
+        if (!p.active) return;
+        if (Math.abs(p.z - s.playerZ) < 60 && Math.abs(p.x - s.playerX) < 15) {
+          p.active = false;
+          s.boostEndTime = now + BOOST_DURATION_MS;
+          spawnParticles(window.innerWidth / 2, window.innerHeight * CAMERA_OFFSET_Y, 20, '#facc15');
         }
+      });
+
+      // Check for finish
+      if (s.playerZ >= FINISH_LINE_Z) {
+        s.finishTime = now;
+        s.didWin = true;
+        // Immediate confetti burst
+        spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 50, '#FFD700', 0.2);
+      } else if (s.hareZ >= FINISH_LINE_Z) {
+        s.finishTime = now;
+        s.didWin = false;
+      }
 
     } else {
-        // Post-Race Sequence (Animation for 3 seconds)
-        const timeSinceFinish = now - s.finishTime;
+      // Post-Race Sequence (Animation for 3 seconds)
+      const timeSinceFinish = now - s.finishTime;
 
-        // Slow down player gracefully
-        s.playerSpeed *= 0.95;
-        s.playerZ += s.playerSpeed;
-        
-        // Hare continues or slows down
-        s.hareSpeed *= 0.95;
-        s.hareZ += s.hareSpeed;
+      // Slow down player gracefully
+      s.playerSpeed *= 0.95;
+      s.playerZ += s.playerSpeed;
 
-        // Win Effects
-        if (s.didWin && timeSinceFinish < 2500 && Math.random() > 0.8) {
-           spawnConfetti(window.innerWidth, window.innerHeight);
-        }
+      // Hare continues or slows down
+      s.hareSpeed *= 0.95;
+      s.hareZ += s.hareSpeed;
 
-        // Trigger Game Over Callback after 3s
-        if (timeSinceFinish > 3000 && !s.gameOverTriggered) {
-            s.gameOverTriggered = true;
-            onGameOver(s.didWin);
-        }
+      // Win Effects
+      if (s.didWin && timeSinceFinish < 2500 && Math.random() > 0.8) {
+        spawnConfetti(window.innerWidth, window.innerHeight);
+      }
+
+      // Trigger Game Over Callback after 3s
+      if (timeSinceFinish > 3000 && !s.gameOverTriggered) {
+        s.gameOverTriggered = true;
+        onGameOver(s.didWin);
+      }
     }
 
     // --- Particles Update ---
@@ -237,15 +237,15 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     // --- Draw Road ---
     const roadW = width * (ROAD_WIDTH_PCT / 100);
     const roadX = (width - roadW) / 2;
-    
+
     // Grass
     ctx.fillStyle = '#064e3b'; // emerald-900
     ctx.fillRect(0, 0, width, height);
 
     // Road Body
-    ctx.fillStyle = '#52525b'; 
+    ctx.fillStyle = '#52525b';
     ctx.fillRect(roadX, 0, roadW, height);
-    
+
     // Coordinate Helpers
     const getScreenY = (objZ: number) => {
       const relZ = objZ - s.playerZ;
@@ -261,58 +261,58 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     const shouldJump = !(s.finishTime > 0 && !s.didWin); // Stop jumping if lost
 
     s.crowd.forEach(member => {
-       const screenY = getScreenY(member.z);
-       // Only draw if visible
-       if (screenY > -50 && screenY < height + 50) {
-          const screenX = getScreenX(member.x);
-          
-          let yOffset = 0;
-          if (shouldJump) {
-             yOffset = Math.abs(Math.sin(now * bounceSpeed + member.jumpOffset)) * 15;
-          }
+      const screenY = getScreenY(member.z);
+      // Only draw if visible
+      if (screenY > -50 && screenY < height + 50) {
+        const screenX = getScreenX(member.x);
 
-          ctx.save();
-          ctx.translate(screenX, screenY - yOffset);
-          
-          // Shadow
-          ctx.fillStyle = 'rgba(0,0,0,0.3)';
-          ctx.beginPath();
-          ctx.ellipse(0, 15 + yOffset, 10, 4, 0, 0, Math.PI*2); // Shadow stays on ground
-          ctx.fill();
+        let yOffset = 0;
+        if (shouldJump) {
+          yOffset = Math.abs(Math.sin(now * bounceSpeed + member.jumpOffset)) * 15;
+        }
 
-          // Body
-          ctx.fillStyle = member.color;
-          ctx.beginPath();
-          ctx.arc(0, 0, 12, 0, Math.PI*2);
-          ctx.fill();
-          
-          // Ears
-          ctx.beginPath();
-          ctx.arc(-8, -8, 5, 0, Math.PI*2);
-          ctx.arc(8, -8, 5, 0, Math.PI*2);
-          ctx.fill();
+        ctx.save();
+        ctx.translate(screenX, screenY - yOffset);
 
-          // Face (Eyes)
-          ctx.fillStyle = '#fff';
-          ctx.beginPath();
-          ctx.arc(-4, -2, 3, 0, Math.PI*2);
-          ctx.arc(4, -2, 3, 0, Math.PI*2);
-          ctx.fill();
-          
-          ctx.fillStyle = '#000';
-          ctx.beginPath();
-          ctx.arc(-4, -2, 1, 0, Math.PI*2);
-          ctx.arc(4, -2, 1, 0, Math.PI*2);
-          ctx.fill();
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(0, 15 + yOffset, 10, 4, 0, 0, Math.PI * 2); // Shadow stays on ground
+        ctx.fill();
 
-          ctx.restore();
-       }
+        // Body
+        ctx.fillStyle = member.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Ears
+        ctx.beginPath();
+        ctx.arc(-8, -8, 5, 0, Math.PI * 2);
+        ctx.arc(8, -8, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Face (Eyes)
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(-4, -2, 3, 0, Math.PI * 2);
+        ctx.arc(4, -2, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(-4, -2, 1, 0, Math.PI * 2);
+        ctx.arc(4, -2, 1, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
     });
 
     // --- Road Details ---
     const stripeHeight = 60;
     const offsetY = s.playerZ % (stripeHeight * 2);
-    
+
     ctx.save();
     ctx.beginPath();
     ctx.rect(roadX, 0, roadW, height);
@@ -342,23 +342,23 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       const checkSize = 20;
       for (let cx = roadX; cx < roadX + roadW; cx += checkSize) {
         for (let cy = 0; cy < 3; cy++) {
-           ctx.fillStyle = ((cx/checkSize + cy)%2 === 0) ? '#000' : '#fff';
-           ctx.fillRect(cx, finishY - (cy * checkSize), checkSize, checkSize);
+          ctx.fillStyle = ((cx / checkSize + cy) % 2 === 0) ? '#000' : '#fff';
+          ctx.fillRect(cx, finishY - (cy * checkSize), checkSize, checkSize);
         }
       }
-      
+
       // Posts
       ctx.fillStyle = '#b45309';
       ctx.fillRect(roadX - 15, finishY - 150, 15, 150);
       ctx.fillRect(roadX + roadW, finishY - 150, 15, 150);
-      
+
       // Banner
       ctx.fillStyle = '#fde047'; // yellow banner
       ctx.fillRect(roadX, finishY - 140, roadW, 40);
       ctx.fillStyle = '#000';
       ctx.font = 'bold 30px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText("FINISH", width/2, finishY - 110);
+      ctx.fillText("FINISH", width / 2, finishY - 110);
     }
 
     // --- Draw Powerups ---
@@ -367,12 +367,12 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       const py = getScreenY(p.z);
       if (py > -50 && py < height + 50) {
         const px = getScreenX(p.x);
-        
+
         ctx.save();
         ctx.translate(px, py);
         ctx.shadowColor = '#facc15';
         ctx.shadowBlur = 15;
-        
+
         // Pepper
         ctx.fillStyle = '#ef4444';
         ctx.beginPath();
@@ -393,10 +393,10 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     if (hareScreenY > -100 && hareScreenY < height + 100) {
       const hareXOffset = Math.sin(s.hareZ * 0.01) * 20;
       const hx = getScreenX(50 + hareXOffset);
-      
+
       ctx.save();
       ctx.translate(hx, hareScreenY);
-      
+
       // Shadow
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
@@ -404,10 +404,10 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       ctx.fill();
 
       // Body
-      ctx.fillStyle = '#a8a29e'; 
-      ctx.strokeStyle = '#44403c'; 
+      ctx.fillStyle = '#a8a29e';
+      ctx.strokeStyle = '#44403c';
       ctx.lineWidth = 2;
-      
+
       // Ears
       ctx.beginPath();
       ctx.ellipse(-8, -20, 6, 15, -0.2, 0, Math.PI * 2);
@@ -420,11 +420,11 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       ctx.arc(0, 0, 20, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
-      
+
       if (s.hareSpeed < HARE_BASE_SPEED * 0.6) {
         ctx.fillStyle = '#38bdf8';
         ctx.beginPath();
-        ctx.arc(15, -15, 4, 0, Math.PI*2);
+        ctx.arc(15, -15, 4, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
@@ -433,20 +433,20 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     // --- Draw Player (Tortoise) ---
     const playerScreenY = height * CAMERA_OFFSET_Y;
     const playerScreenX = getScreenX(s.playerX);
-    
+
     ctx.save();
     ctx.translate(playerScreenX, playerScreenY);
-    
+
     // Boost effect
     if (s.boostEndTime > Date.now() && s.finishTime === 0) {
-        ctx.globalAlpha = 0.5 + Math.random() * 0.5;
-        ctx.fillStyle = '#fbbf24'; 
-        ctx.beginPath();
-        ctx.moveTo(-10, 25);
-        ctx.lineTo(0, 50 + Math.random() * 20);
-        ctx.lineTo(10, 25);
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
+      ctx.globalAlpha = 0.5 + Math.random() * 0.5;
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(-10, 25);
+      ctx.lineTo(0, 50 + Math.random() * 20);
+      ctx.lineTo(10, 25);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
     }
 
     // Shadow
@@ -456,14 +456,14 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     ctx.fill();
 
     // Legs
-    ctx.fillStyle = '#15803d'; 
+    ctx.fillStyle = '#15803d';
     ctx.beginPath();
     // Animate legs if moving
     const legOffset = s.playerSpeed > 1 ? Math.sin(now * 0.02) * 5 : 0;
-    ctx.arc(-18, -10 + legOffset, 8, 0, Math.PI * 2); 
-    ctx.arc(18, -10 - legOffset, 8, 0, Math.PI * 2);  
-    ctx.arc(-18, 15 - legOffset, 8, 0, Math.PI * 2);  
-    ctx.arc(18, 15 + legOffset, 8, 0, Math.PI * 2);   
+    ctx.arc(-18, -10 + legOffset, 8, 0, Math.PI * 2);
+    ctx.arc(18, -10 - legOffset, 8, 0, Math.PI * 2);
+    ctx.arc(-18, 15 - legOffset, 8, 0, Math.PI * 2);
+    ctx.arc(18, 15 + legOffset, 8, 0, Math.PI * 2);
     ctx.fill();
 
     // Head
@@ -472,14 +472,14 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     ctx.fill();
 
     // Shell
-    ctx.fillStyle = '#22c55e'; 
-    ctx.strokeStyle = '#14532d'; 
+    ctx.fillStyle = '#22c55e';
+    ctx.strokeStyle = '#14532d';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.ellipse(0, 0, 22, 28, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    
+
     // Pattern
     ctx.fillStyle = '#15803d';
     ctx.beginPath();
@@ -492,19 +492,19 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     s.particles.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.globalAlpha = p.life > 1 ? 1 : p.life;
-      
+
       if (p.gravity) {
-          // Confetti rect
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(now * 0.01 + p.vx); // Rotate confetti
-          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-          ctx.restore();
+        // Confetti rect
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(now * 0.01 + p.vx); // Rotate confetti
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
       } else {
-          // Standard round particle
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
+        // Standard round particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
       }
     });
     ctx.globalAlpha = 1.0;
@@ -512,41 +512,41 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
     // --- Win/Lose Overlay Text in World? No, Screen overlay is drawn by React or Canvas ---
     // Let's draw it in Canvas for perfect sync with animation
     if (s.finishTime > 0) {
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillRect(0, height/2 - 60, width, 120);
-        
-        ctx.font = '900 60px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        if (s.didWin) {
-            ctx.fillStyle = '#fbbf24';
-            ctx.shadowColor = '#000';
-            ctx.shadowBlur = 10;
-            ctx.fillText("YOU WON!", width/2, height/2);
-            
-            ctx.font = 'bold 30px sans-serif';
-            ctx.fillStyle = '#fff';
-            ctx.fillText("AMAZING SPEED!", width/2, height/2 + 45);
-        } else {
-            ctx.fillStyle = '#f87171';
-            ctx.shadowColor = '#000';
-            ctx.shadowBlur = 10;
-            ctx.fillText("FINISHED", width/2, height/2);
-            
-            ctx.font = 'bold 30px sans-serif';
-            ctx.fillStyle = '#fff';
-            ctx.fillText("Maybe next time...", width/2, height/2 + 45);
-        }
-        ctx.restore();
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(0, height / 2 - 60, width, 120);
+
+      ctx.font = '900 60px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      if (s.didWin) {
+        ctx.fillStyle = '#fbbf24';
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 10;
+        ctx.fillText("YOU WON!", width / 2, height / 2);
+
+        ctx.font = 'bold 30px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.fillText("AMAZING SPEED!", width / 2, height / 2 + 45);
+      } else {
+        ctx.fillStyle = '#f87171';
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 10;
+        ctx.fillText("FINISHED", width / 2, height / 2);
+
+        ctx.font = 'bold 30px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.fillText("Maybe next time...", width / 2, height / 2 + 45);
+      }
+      ctx.restore();
     }
 
     // --- Speed Lines ---
     if (s.playerSpeed > BASE_SPEED * 1.2 && s.finishTime === 0) {
       ctx.strokeStyle = 'rgba(255,255,255,0.2)';
       ctx.lineWidth = 2;
-      for(let i=0; i<5; i++) {
+      for (let i = 0; i < 5; i++) {
         const lx = Math.random() * width;
         const ly = Math.random() * height;
         const lLen = 50 + Math.random() * 100;
@@ -566,10 +566,10 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       draw();
       requestRef.current = requestAnimationFrame(loop);
     };
-    
+
     if (canvasRef.current) {
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
+      canvasRef.current.width = window.innerWidth;
+      canvasRef.current.height = window.innerHeight;
     }
 
     requestRef.current = requestAnimationFrame(loop);
@@ -609,21 +609,21 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-black">
-      <canvas ref={canvasRef} className="block w-full h-full" />
-      
+    <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: 'black' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
+
       {/* Touch Controls Layer */}
-      <div className="absolute inset-0 flex z-20">
-        <div 
-          className="w-1/2 h-full active:bg-white/5 transition-colors"
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 20 }}>
+        <div
+          style={{ width: '50%', height: '100%', cursor: 'pointer' }}
           onTouchStart={() => handleInputStart('left')}
           onTouchEnd={() => handleInputEnd('left')}
           onMouseDown={() => handleInputStart('left')}
           onMouseUp={() => handleInputEnd('left')}
           onMouseLeave={() => handleInputEnd('left')}
         />
-        <div 
-          className="w-1/2 h-full active:bg-white/5 transition-colors"
+        <div
+          style={{ width: '50%', height: '100%', cursor: 'pointer' }}
           onTouchStart={() => handleInputStart('right')}
           onTouchEnd={() => handleInputEnd('right')}
           onMouseDown={() => handleInputStart('right')}
@@ -633,54 +633,157 @@ const RaceGame: React.FC<RaceGameProps> = ({ onGameOver }) => {
       </div>
 
       {/* HUD Layer */}
-      <div className={`absolute top-0 left-0 w-full p-4 z-30 pointer-events-none flex flex-col gap-4 transition-opacity duration-500 ${hudState.showResult ? 'opacity-0' : 'opacity-100'}`}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        padding: '1rem',
+        zIndex: 30,
+        pointerEvents: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+        transition: 'opacity 0.5s',
+        opacity: hudState.showResult ? 0 : 1
+      }}>
         {/* Progress Bar */}
-        <div className="w-full max-w-lg mx-auto bg-gray-800/80 backdrop-blur rounded-full h-8 border-2 border-white/20 relative overflow-hidden">
-           {/* Finish Line Marker */}
-           <div className="absolute right-0 top-0 bottom-0 w-4 bg-yellow-400 z-10 border-l border-black/20 flex items-center justify-center">
-             <Flag size={12} className="text-yellow-900" fill="currentColor" />
-           </div>
-           
-           {/* Hare Icon */}
-           <div 
-             className="absolute top-1/2 -translate-y-1/2 transition-all duration-300"
-             style={{ left: `${Math.min(95, (hudState.hareDistance / FINISH_LINE_Z) * 100)}%` }}
-           >
-              <div className="w-6 h-6 bg-stone-400 rounded-full border-2 border-white shadow flex items-center justify-center text-[10px] -ml-3">
-                 🐰
-              </div>
-           </div>
+        <div style={{
+          width: '100%',
+          maxWidth: '32rem',
+          margin: '0 auto',
+          backgroundColor: 'rgba(31, 41, 55, 0.8)',
+          backdropFilter: 'blur(4px)',
+          borderRadius: '9999px',
+          height: '2rem',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Finish Line Marker */}
+          <div style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: '1rem',
+            backgroundColor: '#facc15', // yellow-400
+            zIndex: 10,
+            borderLeft: '1px solid rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Flag size={12} color="#713f12" fill="currentColor" />
+          </div>
 
-           {/* Turtle Icon */}
-           <div 
-             className="absolute top-1/2 -translate-y-1/2 transition-all duration-75"
-             style={{ left: `${Math.min(95, (hudState.distance / FINISH_LINE_Z) * 100)}%` }}
-           >
-              <div className="w-6 h-6 bg-emerald-500 rounded-full border-2 border-white shadow flex items-center justify-center text-[10px] -ml-3 z-20">
-                 🐢
-              </div>
-           </div>
+          {/* Hare Icon */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              transition: 'all 0.3s',
+              left: `${Math.min(95, (hudState.hareDistance / FINISH_LINE_Z) * 100)}%`
+            }}
+          >
+            <div style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              backgroundColor: '#78716c', // stone-500
+              borderRadius: '9999px',
+              border: '2px solid white',
+              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              marginLeft: '-0.75rem'
+            }}>
+              🐰
+            </div>
+          </div>
+
+          {/* Turtle Icon */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              transition: 'all 0.075s',
+              left: `${Math.min(95, (hudState.distance / FINISH_LINE_Z) * 100)}%`
+            }}
+          >
+            <div style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              backgroundColor: '#10b981', // emerald-500
+              borderRadius: '9999px',
+              border: '2px solid white',
+              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              marginLeft: '-0.75rem',
+              zIndex: 20
+            }}>
+              🐢
+            </div>
+          </div>
         </div>
-        
+
         {/* Status Text */}
-        <div className="flex justify-between items-start max-w-lg mx-auto w-full text-white font-bold drop-shadow-md">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors ${hudState.boostActive ? 'bg-yellow-500 text-yellow-900' : 'bg-black/40'}`}>
-                <Zap size={24} fill={hudState.boostActive ? "currentColor" : "none"} />
-                <span className="text-xl">{hudState.boostActive ? "BOOST!" : "NORMAL"}</span>
-            </div>
-            
-            <div className="text-right">
-                <div className="text-xs opacity-70">DISTANCE</div>
-                <div className="text-xl font-mono">{Math.floor(Math.max(0, FINISH_LINE_Z - hudState.distance))}m</div>
-            </div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          maxWidth: '32rem',
+          margin: '0 auto',
+          width: '100%',
+          color: 'white',
+          fontWeight: 'bold',
+          filter: 'drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.75rem',
+            transition: 'background-color 0.15s',
+            backgroundColor: hudState.boostActive ? '#eab308' : 'rgba(0, 0, 0, 0.4)',
+            color: hudState.boostActive ? '#713f12' : 'white'
+          }}>
+            <Zap size={24} fill={hudState.boostActive ? "currentColor" : "none"} />
+            <span style={{ fontSize: '1.25rem' }}>{hudState.boostActive ? "BOOST!" : "NORMAL"}</span>
+          </div>
+
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>DISTANCE</div>
+            <div style={{ fontSize: '1.25rem', fontFamily: 'monospace' }}>{Math.floor(Math.max(0, FINISH_LINE_Z - hudState.distance))}m</div>
+          </div>
         </div>
       </div>
-      
+
       {/* Control Hints (Hidden when finished) */}
       {!hudState.showResult && (
-        <div className="absolute bottom-10 left-0 w-full px-8 flex justify-between pointer-events-none opacity-50 text-white font-bold text-2xl">
-            <span className="animate-pulse">← LEFT</span>
-            <span className="animate-pulse">RIGHT →</span>
+        <div style={{
+          position: 'absolute',
+          bottom: '2.5rem',
+          left: 0,
+          width: '100%',
+          padding: '0 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          pointerEvents: 'none',
+          opacity: 0.5,
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '1.5rem'
+        }}>
+          <span style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>← LEFT</span>
+          <span style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>RIGHT →</span>
         </div>
       )}
     </div>

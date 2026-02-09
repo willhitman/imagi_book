@@ -20,52 +20,150 @@ const HUD: React.FC<HUDProps> = ({ score, timeLeft, inventory, required, onFinis
   };
 
   return (
-    <div className="absolute top-0 left-0 right-0 p-4 pointer-events-none z-50 flex flex-col md:flex-row justify-between items-start md:items-center">
-      
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      padding: '1rem',
+      pointerEvents: 'none',
+      zIndex: 50,
+      display: 'flex',
+      flexDirection: 'row', // Assuming landscape game usually, but inline styles allow media queries less easily. We'll default to row or column based on logic or just use flex-wrap.
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: '1rem'
+    }}>
+
       {/* Top Left: Score & Time */}
-      <div className="flex gap-4 mb-4 md:mb-0">
-        <div className="bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-lg border-2 border-amber-100 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-amber-600" />
-          <span className={`font-bold text-xl font-mono ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0' }}>
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(4px)',
+          padding: '0.75rem',
+          borderRadius: '1rem',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          border: '2px solid #fef3c7', // amber-100
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <Clock size={20} color="#d97706" />
+          <span style={{
+            fontWeight: 'bold',
+            fontSize: '1.25rem',
+            fontFamily: 'monospace',
+            color: timeLeft < 30 ? '#ef4444' : '#374151'
+          }}>
             {formatTime(timeLeft)}
           </span>
         </div>
-        <div className="bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-lg border-2 border-amber-100 flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-yellow-500" />
-          <span className="font-bold text-xl text-gray-700">{score}</span>
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(4px)',
+          padding: '0.75rem',
+          borderRadius: '1rem',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          border: '2px solid #fef3c7',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <Trophy size={20} color="#eab308" />
+          <span style={{ fontWeight: 'bold', fontSize: '1.25rem', color: '#374151' }}>{score}</span>
         </div>
       </div>
 
       {/* Center/Right: Finish Button */}
-      <div className="pointer-events-auto">
+      <div style={{ pointerEvents: 'auto' }}>
         {canFinish && (
           <button
             onClick={onFinish}
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-xl transform transition hover:scale-105 animate-bounce flex items-center gap-2 border-4 border-green-200"
+            style={{
+              backgroundColor: '#22c55e',
+              color: 'white',
+              fontWeight: 'bold',
+              padding: '0.75rem 2rem',
+              borderRadius: '9999px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              border: '4px solid #bbf7d0', // green-200
+              cursor: 'pointer',
+              transition: 'transform 0.1s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             <span>Finish!</span>
-            <Check className="w-6 h-6" />
+            <Check size={24} />
           </button>
         )}
       </div>
 
       {/* Top Right: Objective List */}
-      <div className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-lg border-2 border-amber-100 mt-4 md:mt-0">
-        <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Required Flowers</h3>
-        <div className="flex gap-4">
+      <div style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(4px)',
+        padding: '1rem',
+        borderRadius: '1rem',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        border: '2px solid #fef3c7',
+        marginTop: 0
+      }}>
+        <h3 style={{
+          color: '#6b7280',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          marginBottom: '0.5rem'
+        }}>Required Flowers</h3>
+        <div style={{ display: 'flex', gap: '1rem' }}>
           {[FlowerType.RED_ROSE, FlowerType.BLUE_VIOLET, FlowerType.YELLOW_DAISY].map((type) => {
             const count = inventory[type] || 0;
             const target = required[type];
             const isComplete = count >= target;
-            const colorClass = FLOWER_COLORS[type];
+
+            // Map Tailwind colors to hex for inline
+            let bgHex = '#f3f4f6';
+            let dotHex = '#d1d5db';
+
+            if (isComplete) {
+              bgHex = '#dcfce7'; // green-100
+            }
+
+            if (type === FlowerType.RED_ROSE) dotHex = '#ef4444';
+            else if (type === FlowerType.BLUE_VIOLET) dotHex = '#3b82f6';
+            else if (type === FlowerType.YELLOW_DAISY) dotHex = '#facc15';
 
             return (
-              <div key={type} className={`flex flex-col items-center ${isComplete ? 'opacity-50 grayscale' : 'opacity-100'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${isComplete ? 'bg-green-100' : 'bg-gray-100'}`}>
-                   {/* Simple dot representation of flower color */}
-                   <div className={`w-4 h-4 rounded-full ${colorClass.replace('text-', 'bg-')}`} />
+              <div key={type} style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                opacity: isComplete ? 0.5 : 1.0,
+                filter: isComplete ? 'grayscale(100%)' : 'none'
+              }}>
+                <div style={{
+                  width: '2rem',
+                  height: '2rem',
+                  borderRadius: '9999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '0.25rem',
+                  backgroundColor: bgHex
+                }}>
+                  <div style={{ width: '1rem', height: '1rem', borderRadius: '9999px', backgroundColor: dotHex }} />
                 </div>
-                <span className={`text-sm font-bold ${isComplete ? 'text-green-600' : 'text-gray-700'}`}>
+                <span style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                  color: isComplete ? '#16a34a' : '#374151'
+                }}>
                   {Math.min(count, target)}/{target}
                 </span>
               </div>

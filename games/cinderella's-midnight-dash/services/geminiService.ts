@@ -3,8 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 let genAI: GoogleGenAI | null = null;
 
 const getAI = () => {
-  if (!genAI && process.env.API_KEY) {
-    genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!genAI) {
+    genAI = new GoogleGenAI({ apiKey: "AIzaSyCeGdUkYQZ24n5B0nR2p2EeDORsxZ2Euc8" });
   }
   return genAI;
 };

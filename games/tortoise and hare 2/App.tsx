@@ -6,39 +6,154 @@ import { Turtle, Trophy, Timer, Zap } from 'lucide-react';
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.MENU);
 
+  const handleContinue = () => {
+    // @ts-ignore
+    if (window.GameChannel) {
+      // @ts-ignore
+      window.GameChannel.postMessage('GAME_COMPLETE');
+    } else {
+      console.log('GameChannel not found');
+    }
+  };
+
+  const handleQuit = () => {
+    // @ts-ignore
+    if (window.GameChannel) {
+      // @ts-ignore
+      window.GameChannel.postMessage('GAME_QUIT');
+    } else {
+      console.log('GameChannel not found, simulating quit');
+      window.close();
+    }
+  };
+
   return (
-    <div className="w-full h-screen bg-emerald-900 flex flex-col items-center justify-center relative overflow-hidden">
+    <div style={{
+      width: '100%',
+      height: '100vh',
+      backgroundColor: '#064e3b', // emerald-900
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+      fontFamily: 'sans-serif'
+    }}>
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" 
-           style={{ 
-             backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', 
-             backgroundSize: '20px 20px' 
-           }} 
-      />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: 0.1,
+        pointerEvents: 'none',
+        backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+        backgroundSize: '20px 20px'
+      }} />
 
       {gameState === GameState.MENU && (
-        <div className="z-10 bg-white/10 backdrop-blur-md p-8 rounded-3xl border-4 border-emerald-400 shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in duration-300">
-          <div className="flex justify-center mb-6">
-            <div className="bg-emerald-500 p-4 rounded-full border-4 border-white shadow-lg">
-              <Turtle size={64} className="text-white" />
+        <div style={{
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(12px)',
+          padding: '2rem',
+          borderRadius: '1.5rem',
+          border: '4px solid #34d399', // emerald-400
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          maxWidth: '28rem',
+          width: '100%',
+          textAlign: 'center',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <div style={{
+              backgroundColor: '#10b981', // emerald-500
+              padding: '1rem',
+              borderRadius: '9999px',
+              border: '4px solid white',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Turtle size={64} color="white" />
             </div>
           </div>
-          <h1 className="text-5xl font-black text-emerald-300 mb-2 drop-shadow-md tracking-tight">
-            TORTOISE<br/>TURBO
+          <h1 style={{
+            fontSize: '3rem',
+            fontWeight: 900,
+            color: '#6ee7b7', // emerald-300
+            marginBottom: '0.5rem',
+            textShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            lineHeight: 1.1
+          }}>
+            TORTOISE<br />TURBO
           </h1>
-          <p className="text-emerald-100 text-lg mb-6 font-medium">
-            The Hare is fast, but he gets lazy. <br/>
-            Grab <span className="text-yellow-300 font-bold inline-flex items-center gap-1"><Zap size={16} fill="currentColor" /> Peppers</span> to boost!
+          <p style={{
+            color: '#d1fae5', // emerald-100
+            fontSize: '1.125rem',
+            marginBottom: '1.5rem',
+            fontWeight: 500
+          }}>
+            The Hare is fast, but he gets lazy. <br />
+            Grab <span style={{ color: '#fde047', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Zap size={16} fill="currentColor" /> Peppers</span> to boost!
           </p>
-          
-          <button 
+
+          <button
             onClick={() => setGameState(GameState.RACING)}
-            className="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-black text-2xl rounded-xl shadow-[0_4px_0_rgb(161,98,7)] active:shadow-none active:translate-y-1 transition-all"
+            style={{
+              width: '100%',
+              padding: '1rem',
+              backgroundColor: '#facc15', // yellow-400
+              color: '#713f12', // yellow-900
+              fontWeight: 900,
+              fontSize: '1.5rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(161,98,7)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(161,98,7)';
+            }}
           >
             START RACE
           </button>
-          
-          <div className="mt-6 text-sm text-emerald-300/60 font-mono">
+
+          <button
+            onClick={handleQuit}
+            style={{
+              width: '100%',
+              marginTop: '1rem',
+              padding: '1rem',
+              backgroundColor: '#ef4444', // red-500
+              color: 'white',
+              fontWeight: 900,
+              fontSize: '1.25rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(185,28,28)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(185,28,28)';
+            }}
+          >
+            QUIT
+          </button>
+
+          <div style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'rgba(110, 231, 183, 0.6)', fontFamily: 'monospace' }}>
             Tap Left / Right to Steer
           </div>
         </div>
@@ -49,41 +164,179 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.WON && (
-        <div className="z-10 bg-white/10 backdrop-blur-md p-8 rounded-3xl border-4 border-yellow-400 shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in duration-300">
-           <div className="flex justify-center mb-6">
-            <div className="bg-yellow-500 p-4 rounded-full border-4 border-white shadow-lg animate-bounce">
-              <Trophy size={64} className="text-white" />
+        <div style={{
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(12px)',
+          padding: '2rem',
+          borderRadius: '1.5rem',
+          border: '4px solid #facc15', // yellow-400
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          maxWidth: '28rem',
+          width: '100%',
+          textAlign: 'center',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <div style={{
+              backgroundColor: '#eab308', // yellow-500
+              padding: '1rem',
+              borderRadius: '9999px',
+              border: '4px solid white',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              animation: 'bounce 1s infinite',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Trophy size={64} color="white" />
             </div>
           </div>
-          <h1 className="text-5xl font-black text-yellow-300 mb-2 drop-shadow-md">VICTORY!</h1>
-          <p className="text-yellow-100 text-lg mb-8">
-            Slow and steady? No way.<br/>Fast and boosted won the race!
+          <h1 style={{ fontSize: '3rem', fontWeight: 900, color: '#fde047', marginBottom: '0.5rem', textShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>VICTORY!</h1>
+          <p style={{ color: '#fef9c3', fontSize: '1.125rem', marginBottom: '2rem' }}>
+            Slow and steady? No way.<br />Fast and boosted won the race!
           </p>
-          <button 
-            onClick={() => setGameState(GameState.RACING)}
-            className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-black text-2xl rounded-xl shadow-[0_4px_0_rgb(6,95,70)] active:shadow-none active:translate-y-1 transition-all"
+          <button
+            onClick={handleContinue}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              backgroundColor: '#10b981', // emerald-500
+              color: 'white',
+              fontWeight: 900,
+              fontSize: '1.5rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(6,95,70)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(6,95,70)';
+            }}
           >
-            RACE AGAIN
+            CONTINUE
+          </button>
+          <button
+            onClick={handleQuit}
+            style={{
+              width: '100%',
+              marginTop: '1rem',
+              padding: '1rem',
+              backgroundColor: '#ef4444',
+              color: 'white',
+              fontWeight: 900,
+              fontSize: '1.25rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(185,28,28)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(185,28,28)';
+            }}
+          >
+            QUIT
           </button>
         </div>
       )}
 
       {gameState === GameState.LOST && (
-        <div className="z-10 bg-white/10 backdrop-blur-md p-8 rounded-3xl border-4 border-red-400 shadow-2xl max-w-md w-full text-center animate-in fade-in zoom-in duration-300">
-           <div className="flex justify-center mb-6">
-            <div className="bg-red-500 p-4 rounded-full border-4 border-white shadow-lg">
-              <Timer size={64} className="text-white" />
+        <div style={{
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(12px)',
+          padding: '2rem',
+          borderRadius: '1.5rem',
+          border: '4px solid #f87171', // red-400
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          maxWidth: '28rem',
+          width: '100%',
+          textAlign: 'center',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <div style={{
+              backgroundColor: '#ef4444', // red-500
+              padding: '1rem',
+              borderRadius: '9999px',
+              border: '4px solid white',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Timer size={64} color="white" />
             </div>
           </div>
-          <h1 className="text-5xl font-black text-red-300 mb-2 drop-shadow-md">TOO SLOW!</h1>
-          <p className="text-red-100 text-lg mb-8">
-            The Hare crossed the line first.<br/>Grab more peppers next time!
+          <h1 style={{ fontSize: '3rem', fontWeight: 900, color: '#fca5a5', marginBottom: '0.5rem', textShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>TOO SLOW!</h1>
+          <p style={{ color: '#fee2e2', fontSize: '1.125rem', marginBottom: '2rem' }}>
+            The Hare crossed the line first.<br />Grab more peppers next time!
           </p>
-          <button 
+          <button
             onClick={() => setGameState(GameState.RACING)}
-            className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-black text-2xl rounded-xl shadow-[0_4px_0_rgb(6,95,70)] active:shadow-none active:translate-y-1 transition-all"
+            style={{
+              width: '100%',
+              padding: '1rem',
+              backgroundColor: '#10b981', // emerald-500
+              color: 'white',
+              fontWeight: 900,
+              fontSize: '1.5rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(6,95,70)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(6,95,70)';
+            }}
           >
             TRY AGAIN
+          </button>
+
+          <button
+            onClick={handleQuit}
+            style={{
+              width: '100%',
+              marginTop: '1rem',
+              padding: '1rem',
+              backgroundColor: '#ef4444',
+              color: 'white',
+              fontWeight: 900,
+              fontSize: '1.25rem',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 0 rgb(185,28,28)',
+              transition: 'all 0.1s',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 0 rgb(185,28,28)';
+            }}
+          >
+            QUIT
           </button>
         </div>
       )}

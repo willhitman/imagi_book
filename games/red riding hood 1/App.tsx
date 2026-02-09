@@ -30,11 +30,20 @@ const App: React.FC = () => {
 
   // --- Initialization ---
   const spawnFlowers = useCallback(() => {
+    console.log('spawnFlowers called. containerRef:', containerRef.current);
     if (!containerRef.current) return;
-    
+
     // Safety margin to prevent spawning on edges or directly on basket
     const margin = 50;
     const { clientWidth, clientHeight } = containerRef.current;
+    console.log('Container dimensions:', clientWidth, clientHeight);
+
+    if (clientWidth === 0 || clientHeight === 0) {
+      console.warn('Container has 0 dimension, retrying in 100ms');
+      setTimeout(spawnFlowers, 100);
+      return;
+    }
+
     const basketZoneHeight = 200; // Bottom area reserved for basket
 
     const newFlowers: FlowerData[] = [];
@@ -53,6 +62,7 @@ const App: React.FC = () => {
       }
     });
 
+    console.log(`Spawned ${newFlowers.length} flowers`);
     setFlowers(newFlowers);
   }, []);
 
@@ -93,7 +103,7 @@ const App: React.FC = () => {
     if (gameState.status !== 'PLAYING' || !basketRef.current) return;
 
     const basketRect = basketRef.current.getBoundingClientRect();
-    
+
     // Check if drop point is within basket rect
     // Note: Point is client coordinates from framer-motion
     if (
@@ -119,15 +129,15 @@ const App: React.FC = () => {
     setGameState((prev) => {
       const newCount = (prev.inventory[flower.type] || 0) + 1;
       const required = LEVEL_CONFIG.required[flower.type];
-      
+
       // Calculate score delta
       let scoreDelta = 0;
       if (flower.type !== FlowerType.WHITE_WEED) {
-         // Only score if we haven't exceeded requirements, or maybe small points for extras?
-         // Let's say strictly helpful items score points.
-         scoreDelta = FLOWER_SCORE;
+        // Only score if we haven't exceeded requirements, or maybe small points for extras?
+        // Let's say strictly helpful items score points.
+        scoreDelta = FLOWER_SCORE;
       } else {
-         scoreDelta = -5; // Penalty for weeds
+        scoreDelta = -5; // Penalty for weeds
       }
 
       return {
@@ -163,13 +173,46 @@ const App: React.FC = () => {
   // --- Render ---
   const canFinish = checkWinCondition() && gameState.status === 'PLAYING';
 
+  const handleContinue = () => {
+    // @ts-ignore
+    if (window.GameChannel) {
+      // @ts-ignore
+      window.GameChannel.postMessage('GAME_COMPLETE');
+    } else {
+      console.log('GameChannel not found');
+    }
+  };
+
+  const handleQuit = () => {
+    // @ts-ignore
+    if (window.GameChannel) {
+      // @ts-ignore
+      window.GameChannel.postMessage('GAME_QUIT');
+    } else {
+      console.log('GameChannel not found, simulating quit');
+      window.close();
+    }
+  };
+
   return (
-    <div className="relative w-full h-screen overflow-hidden font-sans select-none">
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '100vh',
+      overflow: 'hidden',
+      fontFamily: 'sans-serif',
+      userSelect: 'none'
+    }}>
       {/* Generated Animated Background */}
       <ForestBackground />
-      
+
       {/* Game Field */}
-      <div ref={containerRef} className="relative w-full h-full z-10">
+      <div ref={containerRef} style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        zIndex: 10
+      }}>
         {flowers.map((flower) => (
           <Flower
             key={flower.id}
@@ -178,9 +221,15 @@ const App: React.FC = () => {
             onDragEnd={handleDragEnd}
           />
         ))}
-        
+
         {/* Basket Position */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+        <div style={{
+          position: 'absolute',
+          bottom: '1rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 20
+        }}>
           <Basket
             ref={basketRef}
             isHovered={basketHovered}
@@ -204,61 +253,197 @@ const App: React.FC = () => {
 
       {/* Start / Game Over Screens */}
       {gameState.status !== 'PLAYING' && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center border-4 border-amber-200">
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 50,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(4px)',
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '1.5rem',
+            padding: '2rem',
+            maxWidth: '28rem',
+            width: '100%',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            textAlign: 'center',
+            border: '4px solid #fde68a' // amber-200
+          }}>
             {gameState.status === 'START' && (
               <>
-                <h1 className="text-3xl font-bold text-amber-800 mb-4">Little Red's Flowers</h1>
-                <p className="text-gray-600 mb-6">
+                <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#92400e', marginBottom: '1rem' }}>Little Red's Flowers</h1>
+                <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>
                   Help Little Red Riding Hood fill her basket!
                   <br />
                   Drag the required flowers into the basket before time runs out.
                 </p>
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                    <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-red-500 mb-1"/> <span className="text-xs">Rose</span></div>
-                    <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-blue-500 mb-1"/> <span className="text-xs">Violet</span></div>
-                    <div className="flex flex-col items-center"><div className="w-8 h-8 rounded-full bg-yellow-400 mb-1"/> <span className="text-xs">Daisy</span></div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', backgroundColor: '#ef4444', marginBottom: '0.25rem' }} /> <span style={{ fontSize: '0.75rem' }}>Rose</span></div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', backgroundColor: '#3b82f6', marginBottom: '0.25rem' }} /> <span style={{ fontSize: '0.75rem' }}>Violet</span></div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', backgroundColor: '#facc15', marginBottom: '0.25rem' }} /> <span style={{ fontSize: '0.75rem' }}>Daisy</span></div>
                 </div>
                 <button
                   onClick={startGame}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105 flex items-center justify-center gap-2"
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <Play size={20} /> Start Game
+                </button>
+                <button
+                  onClick={handleQuit}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#991b1b', // red-800
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  Quit Adventure
                 </button>
               </>
             )}
 
             {gameState.status === 'FINISHED' && (
               <>
-                <h1 className="text-4xl font-bold text-green-600 mb-2">Wonderful!</h1>
-                <p className="text-gray-600 mb-6">Grandma will be so pleased.</p>
-                <div className="bg-amber-50 rounded-xl p-4 mb-6">
-                    <p className="text-sm text-gray-500 uppercase">Final Score</p>
-                    <p className="text-5xl font-bold text-amber-600">{gameState.score}</p>
-                    <p className="text-xs text-gray-400 mt-2">Time Bonus: +{gameState.timeLeft * TIME_BONUS_MULTIPLIER}</p>
+                <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#16a34a', marginBottom: '0.5rem' }}>Wonderful!</h1>
+                <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>Grandma will be so pleased.</p>
+                <div style={{ backgroundColor: '#fffbeb', borderRadius: '0.75rem', padding: '1rem', marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', textTransform: 'uppercase' }}>Final Score</p>
+                  <p style={{ fontSize: '3rem', fontWeight: 'bold', color: '#d97706' }}>{gameState.score}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem' }}>Time Bonus: +{gameState.timeLeft * TIME_BONUS_MULTIPLIER}</p>
                 </div>
                 <button
-                  onClick={startGame}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105 flex items-center justify-center gap-2"
+                  onClick={handleContinue}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#22c55e',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                  <RotateCcw size={20} /> Play Again
+                  <RotateCcw size={20} /> Continue
+                </button>
+                <button
+                  onClick={handleQuit}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#991b1b',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  Quit Adventure
                 </button>
               </>
             )}
 
             {gameState.status === 'GAME_OVER' && (
               <>
-                <h1 className="text-3xl font-bold text-gray-700 mb-4">Time's Up!</h1>
-                <p className="text-gray-600 mb-6">You didn't collect enough flowers in time.</p>
-                <div className="bg-gray-100 rounded-xl p-4 mb-6">
-                    <p className="text-sm text-gray-500 uppercase">Score</p>
-                    <p className="text-4xl font-bold text-gray-600">{gameState.score}</p>
+                <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#374151', marginBottom: '1rem' }}>Time's Up!</h1>
+                <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>You didn't collect enough flowers in time.</p>
+                <div style={{ backgroundColor: '#f3f4f6', borderRadius: '0.75rem', padding: '1rem', marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', textTransform: 'uppercase' }}>Score</p>
+                  <p style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#4b5563' }}>{gameState.score}</p>
                 </div>
                 <button
                   onClick={startGame}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105 flex items-center justify-center gap-2"
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#f59e0b',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <RotateCcw size={20} /> Try Again
+                </button>
+                <button
+                  onClick={handleQuit}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#991b1b',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '9999px',
+                    transition: 'transform 0.1s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  Quit Adventure
                 </button>
               </>
             )}

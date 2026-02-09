@@ -12,6 +12,7 @@ import '../services/gemini_service.dart';
 import '../services/tts_service.dart';
 import '../widgets/story_choice_widget.dart';
 import '../theme/design_tokens.dart';
+import 'game_screen.dart';
 
 class StoryReaderScreen extends StatefulWidget {
   final Story story;
@@ -615,6 +616,9 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   Widget _buildKidsFooter() {
+    debugPrint(
+      'Building Kids Footer. story.gamePath: ${story.gamePath}, story.gamePaths: ${story.gamePaths}',
+    );
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -641,15 +645,64 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           ),
           FloatingActionButton.extended(
             heroTag: "next_btn",
-            onPressed: _handleNextPage,
+            onPressed: () async {
+              if (currentPageIndex == story.pages.length - 1) {
+                // Determine if we should launch a game
+                debugPrint('StoryReader: End of story. Checking for games...');
+                debugPrint('StoryReader: story.gamePath = ${story.gamePath}');
+                debugPrint('StoryReader: story.gamePaths = ${story.gamePaths}');
+
+                String? targetGamePath = story.gamePath;
+                if (story.gamePaths != null && story.gamePaths!.isNotEmpty) {
+                  // Pick a random game
+                  targetGamePath = (story.gamePaths!.toList()..shuffle()).first;
+                }
+
+                if (targetGamePath != null) {
+                  // Launch Game
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GameScreen(
+                            gamePath: targetGamePath!,
+                            title: story.title,
+                          ),
+                    ),
+                  );
+
+                  // Check if game was quit/finished to end adventure
+                  if (result == 'quit' || result == true) {
+                    setState(() {
+                      isFinished = true;
+                    });
+                  }
+                } else {
+                  // Close Book or End Adventure
+                  setState(() {
+                    isFinished = true;
+                  });
+                }
+              } else {
+                _handleNextPage();
+              }
+            },
             label: Text(
               currentPageIndex == story.pages.length - 1
-                  ? "Close Book"
+                  ? ((story.gamePath != null ||
+                          (story.gamePaths != null &&
+                              story.gamePaths!.isNotEmpty))
+                      ? "Play Game"
+                      : "End Adventure")
                   : "Next",
             ),
             icon: Icon(
               currentPageIndex == story.pages.length - 1
-                  ? Icons.menu_book
+                  ? ((story.gamePath != null ||
+                          (story.gamePaths != null &&
+                              story.gamePaths!.isNotEmpty))
+                      ? Icons.games
+                      : Icons.flag)
                   : Icons.arrow_forward,
             ),
             backgroundColor:

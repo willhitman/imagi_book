@@ -47,7 +47,8 @@
     "coverColor": "FFFF4081",
     "ageGroup": "KIDS",
     "isComplete": true,
-    "genre": "FAIRY"
+    "genre": "FAIRY",
+    "gamePath": "assets/games/cinderella's-midnight-dash/index.html"
   },
   {
     "id": "default_jack",
@@ -147,7 +148,8 @@
     "coverColor": "FFFFC107",
     "ageGroup": "KIDS",
     "isComplete": true,
-    "genre": "FAIRY"
+    "genre": "FAIRY",
+    "gamePath": "assets/games/pigs-vs-wolf_-wall-builder/index.html"
   },
   {
     "id": "default_red",
@@ -197,7 +199,11 @@
     "coverColor": "FF2196F3",
     "ageGroup": "KIDS",
     "isComplete": true,
-    "genre": "FAIRY"
+    "genre": "FAIRY",
+    "gamePaths": [
+      "assets/games/red riding hood 1/index.html",
+      "assets/games/hood fighter forest dash/index.html"
+    ]
   },
   {
     "id": "default_vault",
@@ -298,76 +304,75 @@
     "ageGroup": "TWEENS",
     "isComplete": true,
     "genre": "SCIFI"
+  },
+  {
+    "id": "default_room4b",
+    "title": "The Vanishing of Room 4B",
+    "pages": [
+      {
+        "text": "Page 1: The bell rang at Oak Creek Middle School, echoing through the halls. But something was wrong. Room 4B, Mr. Harrison's class, was completely empty.",
+        "imagePrompt": "A school hallway with an open door to a classroom, completely empty desks, eerie silence, dust motes dancing.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 2: Maya, the school reporter, was the first to notice. 'Where is everyone?' she asked. Her best friend Sam adjusted his glasses. 'Maybe a field trip?'",
+        "imagePrompt": "Two middle school kids standing in the doorway, one with a camera, one with glasses, looking confused.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 3: 'No trips today,' said Leo, the conspiracy theorist of the group. 'I checked the schedule. They've been erased.' He held up a blank attendance sheet.",
+        "imagePrompt": "Third kid holding up a clipboard with a blank paper, looking intense, school lockers in background.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 4: They stepped inside. A half-eaten sandwich sat on a desk. A pencil was still rolling on the floor. It was like they vanished in an instant.",
+        "imagePrompt": "Close up of a desk with a sandwich and a rolling pencil, motion blur on the pencil.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 5: On the chalkboard, a single sentence was written in hastily scrawled chalk: 'DON'T LOOK AT THE LIGHT.'",
+        "imagePrompt": "Green chalkboard with white chalk writing 'DON'T LOOK AT THE LIGHT', ominous atmosphere.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 6: 'This is barely a prank,' Sam said nervously. But then the lights in the hallway flickered. A strange, low hum began to vibrate the floor.",
+        "imagePrompt": "Kids looking up at flickering fluorescent lights, shadows stretching long and weird.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 7: 'We need to find them,' Maya said, grabbing her camera. 'Before whatever took them comes back for us.'",
+        "imagePrompt": "Maya looking determined, holding camera up, friends standing behind her ready for adventure.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 8: As they ran down the hall, the school doors slammed suspect. Locked. Note on the glass: 'Testing in Progress. Do Not Exit.'",
+        "imagePrompt": "School double doors with chains or a digital lock sign saying 'TESTING IN PROGRESS', kids banging on glass.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 9: 'My theories are starting to make sense now, aren't they?' Leo whispered. The adventure of Room 4B had just begun.",
+        "imagePrompt": "Leo smiling slightly, spooky lighting, group huddled together planning.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 10: They had three leads: The Principal's Office, the weird Boiler Room, or the Attic where the old bell tower used to be.",
+        "imagePrompt": "Split screen or montage of a fancy office door, a rusty metal boiler door, and a trapdoor to an attic.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 11: 'Let's split up,' Sam suggested. 'No!' yelled Maya and Leo together. 'That's how people go missing in movies!'",
+        "imagePrompt": "Funny moment, Maya and Leo shouting at Sam, Sam looking sheepish.",
+        "isGenerating": false
+      },
+      {
+        "text": "Page 12: They decided to stick together. First stop: The Boiler Room. Something was glowing green beneath the doorframe...",
+        "imagePrompt": "Dark hallway, green eerie glow coming from under a metal door, silhouettes of the three kids approaching.",
+        "isGenerating": false
+      }
+    ],
+    "coverColor": "FF673AB7",
+    "ageGroup": "TWEENS",
+    "isComplete": true,
+    "genre": "MYSTERY"
   }
-},
-{
-  "id": "default_room4b",
-  "title": "The Vanishing of Room 4B",
-  "pages": [
-    {
-      "text": "Page 1: The bell rang at Oak Creek Middle School, echoing through the halls. But something was wrong. Room 4B, Mr. Harrison's class, was completely empty.",
-      "imagePrompt": "A school hallway with an open door to a classroom, completely empty desks, eerie silence, dust motes dancing.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 2: Maya, the school reporter, was the first to notice. 'Where is everyone?' she asked. Her best friend Sam adjusted his glasses. 'Maybe a field trip?'",
-      "imagePrompt": "Two middle school kids standing in the doorway, one with a camera, one with glasses, looking confused.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 3: 'No trips today,' said Leo, the conspiracy theorist of the group. 'I checked the schedule. They've been erased.' He held up a blank attendance sheet.",
-      "imagePrompt": "Third kid holding up a clipboard with a blank paper, looking intense, school lockers in background.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 4: They stepped inside. A half-eaten sandwich sat on a desk. A pencil was still rolling on the floor. It was like they vanished in an instant.",
-      "imagePrompt": "Close up of a desk with a sandwich and a rolling pencil, motion blur on the pencil.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 5: On the chalkboard, a single sentence was written in hastily scrawled chalk: 'DON'T LOOK AT THE LIGHT.'",
-      "imagePrompt": "Green chalkboard with white chalk writing 'DON'T LOOK AT THE LIGHT', ominous atmosphere.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 6: 'This is barely a prank,' Sam said nervously. But then the lights in the hallway flickered. A strange, low hum began to vibrate the floor.",
-      "imagePrompt": "Kids looking up at flickering fluorescent lights, shadows stretching long and weird.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 7: 'We need to find them,' Maya said, grabbing her camera. 'Before whatever took them comes back for us.'",
-      "imagePrompt": "Maya looking determined, holding camera up, friends standing behind her ready for adventure.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 8: As they ran down the hall, the school doors slammed suspect. Locked. Note on the glass: 'Testing in Progress. Do Not Exit.'",
-      "imagePrompt": "School double doors with chains or a digital lock sign saying 'TESTING IN PROGRESS', kids banging on glass.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 9: 'My theories are starting to make sense now, aren't they?' Leo whispered. The adventure of Room 4B had just begun.",
-      "imagePrompt": "Leo smiling slightly, spooky lighting, group huddled together planning.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 10: They had three leads: The Principal's Office, the weird Boiler Room, or the Attic where the old bell tower used to be.",
-      "imagePrompt": "Split screen or montage of a fancy office door, a rusty metal boiler door, and a trapdoor to an attic.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 11: 'Let's split up,' Sam suggested. 'No!' yelled Maya and Leo together. 'That's how people go missing in movies!'",
-      "imagePrompt": "Funny moment, Maya and Leo shouting at Sam, Sam looking sheepish.",
-      "isGenerating": false
-    },
-    {
-      "text": "Page 12: They decided to stick together. First stop: The Boiler Room. Something was glowing green beneath the doorframe...",
-      "imagePrompt": "Dark hallway, green eerie glow coming from under a metal door, silhouettes of the three kids approaching.",
-      "isGenerating": false
-    }
-  ],
-  "coverColor": "FF673AB7",
-  "ageGroup": "TWEENS",
-  "isComplete": true,
-  "genre": "MYSTERY"
-}
 ]

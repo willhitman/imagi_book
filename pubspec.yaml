@@ -79,6 +79,12 @@ flutter:
     - .env
     - assets/default_stories/
     - assets/story_prompts/
+    - assets/games/red riding hood 1/
+    - assets/games/red riding hood 1/assets/
+    - assets/games/cinderella's-midnight-dash/
+    - assets/games/cinderella's-midnight-dash/assets/
+    - assets/games/pigs-vs-wolf_-wall-builder/
+    - assets/games/pigs-vs-wolf_-wall-builder/assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
