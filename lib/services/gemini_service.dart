@@ -20,44 +20,52 @@ class GeminiService {
   // static const String _mainModel = 'gemini-3-flash-preview'; // Faster, cheaper
   static const String _mainModel = 'gemini-3-flash-preview';
 
-  // For image generation (Flash is typically better/faster for this or specialized)
-  static const String _imageModel = 'gemini-2.5-flash-lite';
+  // For image generation
+  static const String _imageModel = 'imagen-4.0-fast-generate-001';
 
   Future<String> generateImage(String prompt) async {
     try {
+      // Use the predict endpoint for Imagen
       final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/$_imageModel:generateContent?key=$_apiKey',
+        'https://generativelanguage.googleapis.com/v1beta/models/$_imageModel:predict?key=$_apiKey',
       );
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "contents": [
-            {
-              "parts": [
-                {"text": prompt},
-              ],
-            },
+          "instances": [
+            {"prompt": prompt},
           ],
+          "parameters": {
+            "sampleCount": 1,
+            "aspectRatio": "1:1",
+            "outputOptions": {"mimeType": "image/jpeg"},
+          },
         }),
       );
 
+      debugPrint('Image Gen Response Status: ${response.statusCode}');
+      // debugPrint('Image Gen Response Body: ${response.body}'); // Uncomment for verbose debug
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['candidates'] != null &&
-            data['candidates'].isNotEmpty &&
-            data['candidates'][0]['content'] != null &&
-            data['candidates'][0]['content']['parts'] != null &&
-            data['candidates'][0]['content']['parts'].isNotEmpty) {
-          final part = data['candidates'][0]['content']['parts'][0];
-          if (part['inlineData'] != null) {
-            final mime = part['inlineData']['mimeType'];
-            final data = part['inlineData']['data'];
-            return 'data:$mime;base64,$data';
+        if (data['predictions'] != null && data['predictions'].isNotEmpty) {
+          final bytes = data['predictions'][0]['bytesBase64Encoded'];
+          if (bytes != null) {
+            return 'data:image/jpeg;base64,$bytes';
           }
         }
+        // Fallback or different structure check
+        if (data['predictions'] != null &&
+            data['predictions'].isNotEmpty &&
+            data['predictions'][0]['mimeType'] != null &&
+            data['predictions'][0]['bytesBase64Encoded'] != null) {
+          final mime = data['predictions'][0]['mimeType'];
+          final bytes = data['predictions'][0]['bytesBase64Encoded'];
+          return 'data:$mime;base64,$bytes';
+        }
       }
-      debugPrint('Image Gen failed: ${response.body}');
+      debugPrint('Image Gen failed: ${response.statusCode} ${response.body}');
       return 'https://placehold.co/1024x1024?text=Image+Generation+Error';
     } catch (e) {
       debugPrint('Error generating image: $e');
