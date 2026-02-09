@@ -41,6 +41,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   // Gauntlet state (Tweens)
   bool isInGauntlet = false;
+  bool isInChoicePortal = false; // Added for story portals
   int challengeCount = 0;
   StoryChallenge? activeChallenge;
   List<Map<String, String>> challengeOutcomes = [];
@@ -73,7 +74,34 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   StoryPage get currentPage => story.pages[currentPageIndex];
 
+  bool _canRevealImage() {
+    if (story.ageGroup == AgeGroup.KIDS) return true;
+
+    // Secondary check: Prompt must not be empty
+    if (currentPage.imagePrompt.isEmpty) return false;
+
+    // TWEENS Logic: First page, Final page, Challenge pages, and Key moments
+    if (currentPageIndex == 0) return true;
+    if (currentPageIndex == story.pages.length - 1) return true;
+    if (currentPage.choices != null && currentPage.choices!.isNotEmpty) {
+      return true;
+    }
+
+    // Heuristic for Key Moment: Look for keywords or specific markers
+    final text = currentPage.text.toUpperCase();
+    if (text.contains("KEY MOMENT") ||
+        text.contains("THE CLIMAX") ||
+        text.contains("[KEY MOMENT]") ||
+        text.contains("[FINAL MOMENT]") ||
+        text.contains("THE END.")) {
+      return true;
+    }
+
+    return false;
+  }
+
   void _checkAndGenerateImage() async {
+    if (!_canRevealImage()) return;
     final shouldGenerateKids =
         story.ageGroup == AgeGroup.KIDS &&
         currentPage.videoUrl == null &&
@@ -132,7 +160,15 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
     */
 
-    // TWEENS Choice trigger (End of current segment)
+    // TWEENS Choice trigger (Portal)
+    if (story.ageGroup == AgeGroup.TWEENS &&
+        currentPage.choices != null &&
+        currentPage.choices!.isNotEmpty) {
+      setState(() => isInChoicePortal = true);
+      return;
+    }
+
+    // Legacy TWEENS Choice trigger (End of current segment)
     if (currentPageIndex == story.pages.length - 1 &&
         story.ageGroup == AgeGroup.TWEENS &&
         !story.isComplete) {
@@ -142,6 +178,14 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     }
 
     if (currentPageIndex < story.pages.length - 1) {
+      // If we detect "The End" early (Tweens), treat it as finished
+      if (story.ageGroup == AgeGroup.TWEENS && _isStoryEnd()) {
+        setState(() {
+          isFinished = true;
+        });
+        return;
+      }
+
       setState(() {
         currentPageIndex++;
       });
@@ -232,7 +276,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
           // Check for "THE END" marker in the last page to determine completion
           final bool nowComplete = nextPages.any(
-            (p) => p.text.toUpperCase().contains("THE END"),
+            (p) => p.text.contains("THE END"),
           );
 
           story = Story(
@@ -861,6 +905,8 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                   child:
                       isGeneratingNext
                           ? const Center(child: CircularProgressIndicator())
+                          : isInChoicePortal
+                          ? _buildChoicePortal()
                           : isInGauntlet && activeChallenge != null
                           ? StoryChoiceWidget(
                             challenge: activeChallenge!,
@@ -869,7 +915,7 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                           : _buildTweensContent(),
                 ),
 
-                if (!isInGauntlet && !isGeneratingNext)
+                if (!isInGauntlet && !isGeneratingNext && !isInChoicePortal)
                   Container(
                     padding: const EdgeInsets.all(16),
                     color: Colors.white.withOpacity(0.9),
@@ -888,14 +934,15 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                         ),
                         ElevatedButton.icon(
                           onPressed: _handleNextPage,
-                          icon: const Icon(Icons.arrow_forward),
-                          label: Text(
-                            currentPageIndex == story.pages.length - 1
-                                ? 'Close Book'
-                                : 'Next',
+                          icon: Icon(
+                            _isStoryEnd() ? Icons.book : Icons.arrow_forward,
                           ),
+                          label: Text(_isStoryEnd() ? 'Close Book' : 'Next'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.kidBlue,
+                            backgroundColor:
+                                _isStoryEnd()
+                                    ? AppColors.kidGreen
+                                    : AppColors.kidBlue,
                             foregroundColor: Colors.white,
                           ),
                         ),
@@ -908,6 +955,12 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         ],
       ),
     );
+  }
+
+  bool _isStoryEnd() {
+    if (currentPageIndex == story.pages.length - 1) return true;
+    final text = currentPage.text;
+    return text.contains("THE END");
   }
 
   Widget _buildTweensContent() {
@@ -941,15 +994,16 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
                           onPressed: _toggleAudio,
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton.icon(
-                          onPressed: () => setIsRevealed(!isRevealed),
-                          icon: Icon(
-                            isRevealed
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                        if (_canRevealImage())
+                          ElevatedButton.icon(
+                            onPressed: () => setIsRevealed(!isRevealed),
+                            icon: Icon(
+                              isRevealed
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            label: Text(isRevealed ? "REVEALED" : "REVEAL"),
                           ),
-                          label: Text(isRevealed ? "REVEALED" : "REVEAL"),
-                        ),
                       ],
                     ),
                   ],
@@ -1104,25 +1158,62 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
     );
   }
 
+  String _cleanNavigationText(String text) {
+    var clean = text;
+    // Remove "If you..., TURN TO PAGE X." (conditional navigation)
+    clean = clean.replaceAll(
+      RegExp(
+        r'If you[^.]*TURN TO PAGE \d+.*',
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      '',
+    );
+    // Remove "TURN TO PAGE X..." (direct navigation)
+    clean = clean.replaceAll(
+      RegExp(r'TURN TO PAGE \d+.*', caseSensitive: false, dotAll: true),
+      '',
+    );
+    return clean.trim();
+  }
+
   Widget _buildInteractiveTweenText() {
-    final words = currentPage.text.split(' ');
+    final displayText = _cleanNavigationText(currentPage.text);
+    // Regex to split text into words, whitespace (including newlines), and punctuation
+    final regex = RegExp(r'(\s+|[^\s\w]+|\w+)');
+    final matches = regex.allMatches(displayText);
 
     return SelectableText.rich(
       TextSpan(
         children:
-            words.map((word) {
-              final cleanWord = word.replaceAll(RegExp(r'[^\w\s]'), '');
-              return TextSpan(
-                text: "$word ",
-                style: GoogleFonts.comicNeue(
-                  fontSize: 24,
-                  height: 1.5,
-                  color: Colors.black87,
-                ),
-                recognizer:
-                    TapGestureRecognizer()
-                      ..onTap = () => _handleTweenWordTap(cleanWord),
-              );
+            matches.map((match) {
+              final part = match.group(0)!;
+              // Check if it's a word we can define (alphanumeric)
+              final isWord = RegExp(r'^\w+$').hasMatch(part);
+
+              if (isWord) {
+                return TextSpan(
+                  text: part,
+                  style: GoogleFonts.comicNeue(
+                    fontSize: 24,
+                    height: 1.5,
+                    color: Colors.black87,
+                  ),
+                  recognizer:
+                      TapGestureRecognizer()
+                        ..onTap = () => _handleTweenWordTap(part),
+                );
+              } else {
+                // Return whitespace or punctuation as non-tappable text
+                return TextSpan(
+                  text: part,
+                  style: GoogleFonts.comicNeue(
+                    fontSize: 24,
+                    height: 1.5,
+                    color: Colors.black87,
+                  ),
+                );
+              }
             }).toList(),
       ),
     );
@@ -1222,6 +1313,77 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
         ),
         Text(content, style: const TextStyle(fontSize: 16)),
       ],
+    );
+  }
+
+  Widget _buildChoicePortal() {
+    final choices = currentPage.choices ?? [];
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.explore, size: 80, color: Colors.indigo),
+          const SizedBox(height: 24),
+          Text(
+            "THE CHOICE IS YOURS",
+            style: GoogleFonts.comicNeue(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Which path will you take?",
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+          const SizedBox(height: 40),
+          ...choices.map((choice) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    // Navigate to the target page (1-indexed in template, so subtract 1 if needed)
+                    // Actually, the parser should probably handle index conversion,
+                    // but usually "Page 16" is index 15.
+                    currentPageIndex = choice.targetPage - 1;
+                    isInChoicePortal = false;
+                  });
+                  _checkAndGenerateImage();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.indigo,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 20,
+                  ),
+                  side: const BorderSide(color: Colors.indigo, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  minimumSize: const Size(double.infinity, 60),
+                ),
+                child: Text(
+                  choice.text,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }).toList(),
+          const SizedBox(height: 20),
+          TextButton(
+            onPressed: () => setState(() => isInChoicePortal = false),
+            child: const Text("Go Back"),
+          ),
+        ],
+      ),
     );
   }
 }
