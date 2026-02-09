@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/types.dart';
+import '../utils/story_parser.dart';
 
 class GeminiService {
   final String _apiKey;
@@ -18,7 +19,7 @@ class GeminiService {
   // Uncomment the line you wish to use.
   // static const String _mainModel = 'gemini-1.5-pro'; // Standard Pro model
   // static const String _mainModel = 'gemini-3-flash-preview'; // Faster, cheaper
-  static const String _mainModel = 'gemini-3-flash-preview';
+  static const String _mainModel = 'gemini-1.5-pro';
 
   // For image generation
   static const String _imageModel = 'imagen-4.0-fast-generate-001';
@@ -80,27 +81,19 @@ class GeminiService {
     int count, {
     String? previousContext,
   }) async {
-    // Override model for Tweens if needed, or use main model
     final modelName = _mainModel;
-    final model = GenerativeModel(
-      model: modelName,
-      apiKey: _apiKey,
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: Schema.array(
-          items: Schema.object(
-            properties: {
-              'text': Schema.string(),
-              'imagePrompt': Schema.string(),
-            },
-            requiredProperties: ['text', 'imagePrompt'],
-          ),
-        ),
-      ),
-    );
 
-    String promptText;
     if (ageGroup == AgeGroup.TWEENS) {
+      // For TWEENS, we want a more structured approach following the template.
+      // If the user wants the "whole story at once", we might need a different method,
+      // but for generateStorySegment, we'll enforce the template style.
+
+      final model = GenerativeModel(
+        model: modelName,
+        apiKey: _apiKey,
+        // No schema for TWEENS because we want them to follow the text template
+      );
+
       String template = "";
       try {
         template = await rootBundle.loadString(
@@ -108,59 +101,60 @@ class GeminiService {
         );
       } catch (e) {
         debugPrint("Error loading story template: $e");
-        template = "[Use standard mystery/sci-fi structure]";
+        template =
+            "[Use standard mystery/sci-fi structure with Page X headers and choices]";
       }
 
-      if (previousContext == null) {
-        // First segment for TWEENS
-        promptText = '''
-          You are a professional author writing a long-form interactive story for tweens (9-12).
-          
-          STORY TEMPLATE / GUIDELINES:
-          $template
+      final promptText = '''
+        You are a professional author writing a long-form interactive story for tweens (9-12).
+        
+        STORY TEMPLATE / GUIDELINES:
+        $template
 
-          TASK:
-          Write the FIRST $count pages of the story titled "$title".
-          Follow the "SECTION 1: THE SETUP" guidelines from the template.
-          CRITICAL: Do NOT include any options or choices at the end. The choice will be presented separately.
-          End the segment at a cliiffhanger or decision point.
-          
-          OUTPUT FORMAT:
-          Formatted as a JSON array of objects with 'text' and 'imagePrompt' fields.
-          Each page should be 3-5 sentences.
-          Ensure the style matches the "Tone" detailed in the template.
-        ''';
-      } else {
-        // Continuation for TWEENS
-        promptText = '''
-          You are continuing a long-form interactive story for tweens (9-12).
-          
-          STORY TEMPLATE / GUIDELINES:
-          $template
+        TASK:
+        Generate the ENTIRE story titled "$title" from beginning to end.
+        Follow the template exactly, including all branching paths and endings.
+        Each page MUST start with "Page X" on a new line.
+        Include interactive choices in the specified format: "If you [action], TURN TO PAGE [number]."
+        
+        IMAGE RULES (Only for Tweens):
+        1. Mark exactly ONE page naturally in the middle of each major path as a "[KEY MOMENT]" (e.g., at the end of the text on that page).
+        2. The final page of each path should be marked "[FINAL MOMENT]".
+        
+        Ensure the story is complete and follows the 200-page structure (or as close as you can get while remaining coherent).
+      ''';
 
-          CONTEXT SO FAR: 
-          $previousContext
-
-          TASK:
-          Write the NEXT $count pages.
-          Continue the narrative arc defined in the template sections.
-          CRITICAL: Do NOT include any options or choices at the end. The choice will be presented separately.
-          End the segment at a cliiffhanger or decision point.
-          
-          OUTPUT FORMAT:
-          JSON array of objects with 'text' and 'imagePrompt'.
-          Each page 3-5 sentences.
-        ''';
+      final response = await model.generateContent([Content.text(promptText)]);
+      if (response.text != null) {
+        return StoryParser.parseTemplateStory(response.text!);
       }
     } else {
-      // KIDS
+      // KIDS - Keep existing JSON schema logic
+      final model = GenerativeModel(
+        model: modelName,
+        apiKey: _apiKey,
+        generationConfig: GenerationConfig(
+          responseMimeType: 'application/json',
+          responseSchema: Schema.array(
+            items: Schema.object(
+              properties: {
+                'text': Schema.string(),
+                'imagePrompt': Schema.string(),
+              },
+              requiredProperties: ['text', 'imagePrompt'],
+            ),
+          ),
+        ),
+      );
+
+      String promptText;
       if (previousContext == null) {
         promptText = '''
           Write a children's story titled "$title". 
           It should be suitable for ages 5-8. 
           Write the FIRST $count pages.
           Each page should have simple, readable text (2-3 sentences max).
-          Provide a detailed image prompt for each page that describes a single, beautiful scene for an animation.
+          Provide a detailed image prompt for each page.
           Format as a JSON array of objects with 'text' and 'imagePrompt' fields.
         ''';
       } else {
@@ -172,13 +166,12 @@ class GeminiService {
           Format as a JSON array of objects with 'text' and 'imagePrompt' fields.
         ''';
       }
-    }
 
-    final response = await model.generateContent([Content.text(promptText)]);
-
-    if (response.text != null) {
-      final List<dynamic> json = jsonDecode(response.text!);
-      return json.map((e) => StoryPage.fromJson(e)).toList();
+      final response = await model.generateContent([Content.text(promptText)]);
+      if (response.text != null) {
+        final List<dynamic> json = jsonDecode(response.text!);
+        return json.map((e) => StoryPage.fromJson(e)).toList();
+      }
     }
     throw Exception("Story generation failed");
   }

@@ -8,18 +8,35 @@ enum ChoicePath { CLASSICAL, SHADOW, ENCHANTED }
 
 enum AppView { LIBRARY, READER }
 
+class StoryChoice {
+  final String text;
+  final int targetPage;
+
+  StoryChoice({required this.text, required this.targetPage});
+
+  factory StoryChoice.fromJson(Map<String, dynamic> json) {
+    return StoryChoice(
+      text: json['text'] ?? '',
+      targetPage: json['targetPage'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'text': text, 'targetPage': targetPage};
+}
+
 class StoryPage {
   final String text;
   final String imagePrompt;
-  String?
-  videoUrl; // Using this field name to match React, but will store image URL/data
+  String? videoUrl;
   bool isGenerating;
+  final List<StoryChoice>? choices;
 
   StoryPage({
     required this.text,
     required this.imagePrompt,
     this.videoUrl,
     this.isGenerating = false,
+    this.choices,
   });
 
   factory StoryPage.fromJson(Map<String, dynamic> json) {
@@ -28,6 +45,10 @@ class StoryPage {
       imagePrompt: json['imagePrompt'] ?? '',
       videoUrl: json['videoUrl'],
       isGenerating: json['isGenerating'] ?? false,
+      choices:
+          (json['choices'] as List?)
+              ?.map((c) => StoryChoice.fromJson(c))
+              .toList(),
     );
   }
 
@@ -37,6 +58,7 @@ class StoryPage {
       'imagePrompt': imagePrompt,
       'videoUrl': videoUrl,
       'isGenerating': isGenerating,
+      if (choices != null) 'choices': choices!.map((c) => c.toJson()).toList(),
     };
   }
 }

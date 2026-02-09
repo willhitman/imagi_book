@@ -187,8 +187,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             .value
             .toRadixString(16),
         ageGroup: ageGroup,
-        isComplete:
-            false, // User generated might allow more? Or assume segment?
+        isComplete: ageGroup == AgeGroup.TWEENS,
         genre:
             ageGroup == AgeGroup.TWEENS
                 ? Genre.SCIFI
