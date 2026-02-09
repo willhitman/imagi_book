@@ -95,6 +95,16 @@ class _GameScreenState extends State<GameScreen> {
       await _controller.loadHtmlString(fileText, baseUrl: baseUrl);
     } catch (e) {
       debugPrint("Error loading game asset: $e");
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Optionally show alert and pop
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading game: $e')));
+        Navigator.of(context).pop();
+      }
     }
   }
 

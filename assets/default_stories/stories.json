@@ -200,10 +200,7 @@
     "ageGroup": "KIDS",
     "isComplete": true,
     "genre": "FAIRY",
-    "gamePaths": [
-      "assets/games/red riding hood 1/index.html",
-      "assets/games/hood fighter forest dash/index.html"
-    ]
+    "gamePath": "assets/games/red_riding_hood_1/index.html"
   },
   {
     "id": "default_vault",
