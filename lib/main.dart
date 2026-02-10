@@ -40,7 +40,7 @@ class StorySparkApp extends StatelessWidget {
         Provider(create: (_) => TTSService()),
       ],
       child: MaterialApp(
-        title: 'Story Spark',
+        title: 'ImagiBook',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(

@@ -5,76 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="046feb45-ee8b-4941-bfbe-8671395e7601" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/components/PixelSprites.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/components/RunnerGame.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/services/geminiService.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/cinderella's-midnight-dash/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/components/GameCanvas.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/components/GameUI.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/utils/input.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/hood fighter forest dash/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/components/Block.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/components/Characters.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/services/aiService.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/pigs-vs-wolf_-wall-builder/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/components/Basket.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/components/Flower.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/components/ForestBackground.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/components/HUD.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/red riding hood 1/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/components/RaceGame.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/constants.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/games/tortoise and hare 2/vite.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flutter_app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/default_stories/stories.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/default_stories/stories.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/types.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/types.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/library_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/library_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/story_reader_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/story_reader_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/gemini_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/gemini_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,21 +40,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "willhitman"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;willhitman&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:willhitman/story_spark.git",
-    "accountId": "1da3f812-c19f-41a0-8477-b89c79f03543"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:willhitman/story_spark.git&quot;,
+    &quot;accountId&quot;: &quot;1da3f812-c19f-41a0-8477-b89c79f03543&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="39QOomJn9JhLj6x3VeBKHTyxSpz" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1" />
@@ -130,6 +70,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Flutter.main.dart.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -137,7 +78,8 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "rename__app",
+    "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/will/Documents/story_spark",
     "show.migrate.to.gradle.popup": "false"

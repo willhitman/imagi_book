@@ -1,0 +1,110 @@
+Analyzing story_spark...                                        
+
+   info • 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre • lib/main.dart:50:13 • deprecated_member_use
+   info • The constant name 'KIDS' isn't a lowerCamelCase identifier • lib/models/types.dart:1:17 • constant_identifier_names
+   info • The constant name 'TWEENS' isn't a lowerCamelCase identifier • lib/models/types.dart:1:23 • constant_identifier_names
+   info • The constant name 'FAIRY' isn't a lowerCamelCase identifier • lib/models/types.dart:3:14 • constant_identifier_names
+   info • The constant name 'SCIFI' isn't a lowerCamelCase identifier • lib/models/types.dart:3:21 • constant_identifier_names
+   info • The constant name 'MYSTERY' isn't a lowerCamelCase identifier • lib/models/types.dart:3:28 • constant_identifier_names
+   info • The constant name 'ADVENTURE' isn't a lowerCamelCase identifier • lib/models/types.dart:3:37 • constant_identifier_names
+   info • The constant name 'SUGGESTION' isn't a lowerCamelCase identifier • lib/models/types.dart:5:17 • constant_identifier_names
+   info • The constant name 'CLASSICAL' isn't a lowerCamelCase identifier • lib/models/types.dart:7:19 • constant_identifier_names
+   info • The constant name 'SHADOW' isn't a lowerCamelCase identifier • lib/models/types.dart:7:30 • constant_identifier_names
+   info • The constant name 'ENCHANTED' isn't a lowerCamelCase identifier • lib/models/types.dart:7:38 • constant_identifier_names
+   info • The constant name 'LIBRARY' isn't a lowerCamelCase identifier • lib/models/types.dart:9:16 • constant_identifier_names
+   info • The constant name 'READER' isn't a lowerCamelCase identifier • lib/models/types.dart:9:25 • constant_identifier_names
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/game_screen.dart:128:47 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/screens/library_screen.dart:125:31 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/screens/library_screen.dart:134:31 • curly_braces_in_flow_control_structures
+   info • 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion • lib/screens/library_screen.dart:187:14 • deprecated_member_use
+   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/screens/library_screen.dart:260:37 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:261:48 • deprecated_member_use
+   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/screens/library_screen.dart:263:37 • deprecated_member_use
+   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/screens/library_screen.dart:264:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:349:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:355:51 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:365:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:438:31 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:441:38 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/library_screen.dart:475:45 • deprecated_member_use
+  error • Missing concrete implementation of 'State.build' • lib/screens/story_reader_screen.dart:32:7 • non_abstract_class_inherits_abstract_member
+   info • The local variable '_handleNextPage' starts with an underscore • lib/screens/story_reader_screen.dart:174:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable 'setIsRevealed' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:175:5 • referenced_before_declaration
+  error • Local variable '_triggerStoryChoice' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:206:7 • referenced_before_declaration
+  error • Local variable '_isStoryEnd' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:212:48 • referenced_before_declaration
+   info • The local variable '_handlePrevPage' starts with an underscore • lib/screens/story_reader_screen.dart:231:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable 'setIsRevealed' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:239:7 • referenced_before_declaration
+   info • The local variable '_triggerStoryChoice' starts with an underscore • lib/screens/story_reader_screen.dart:243:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_generateNextChoice' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:245:5 • referenced_before_declaration
+   info • The local variable '_generateNextChoice' starts with an underscore • lib/screens/story_reader_screen.dart:248:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_onChallengeComplete' starts with an underscore • lib/screens/story_reader_screen.dart:274:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_checkConnectivity' starts with an underscore • lib/screens/story_reader_screen.dart:334:16 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_toggleAudio' starts with an underscore • lib/screens/story_reader_screen.dart:339:8 • no_leading_underscores_for_local_identifiers
+warning • The declaration 'build' isn't referenced • lib/screens/story_reader_screen.dart:404:10 • unused_element
+  error • Local variable '_buildFinished' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:405:28 • referenced_before_declaration
+  error • Local variable '_buildCover' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:406:27 • referenced_before_declaration
+  error • Local variable '_buildKidsReader' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:410:14 • referenced_before_declaration
+  error • Local variable '_buildTweensReader' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:412:14 • referenced_before_declaration
+   info • The local variable '_buildKidsReader' starts with an underscore • lib/screens/story_reader_screen.dart:417:10 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_buildKidsHeader' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:427:17 • referenced_before_declaration
+  error • Local variable '_buildVisualContainer' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:437:34 • referenced_before_declaration
+  error • Local variable '_buildActionButtons' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:446:32 • referenced_before_declaration
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:459:51 • deprecated_member_use
+  error • Local variable '_buildInteractiveText' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:470:38 • referenced_before_declaration
+  error • Local variable '_buildKidsFooter' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:498:17 • referenced_before_declaration
+   info • The local variable '_buildKidsHeader' starts with an underscore • lib/screens/story_reader_screen.dart:520:10 • no_leading_underscores_for_local_identifiers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:536:35 • deprecated_member_use
+  error • Local variable '_showSettingsDialog' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:552:24 • referenced_before_declaration
+   info • The local variable '_buildActionButtons' starts with an underscore • lib/screens/story_reader_screen.dart:560:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_wordKeys' starts with an underscore • lib/screens/story_reader_screen.dart:607:25 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_lastSpokenIndex' starts with an underscore • lib/screens/story_reader_screen.dart:608:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildInteractiveText' starts with an underscore • lib/screens/story_reader_screen.dart:610:10 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_handleGlide' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:622:33 • referenced_before_declaration
+  error • Local variable '_handleGlide' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:623:32 • referenced_before_declaration
+  error • Local variable '_speakWord' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:633:32 • referenced_before_declaration
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:640:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:642:49 • deprecated_member_use
+   info • The local variable '_handleGlide' starts with an underscore • lib/screens/story_reader_screen.dart:665:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_speakWord' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:678:13 • referenced_before_declaration
+   info • The local variable '_speakWord' starts with an underscore • lib/screens/story_reader_screen.dart:687:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildKidsFooter' starts with an underscore • lib/screens/story_reader_screen.dart:692:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildVisualContainer' starts with an underscore • lib/screens/story_reader_screen.dart:793:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_showSettingsDialog' starts with an underscore • lib/screens/story_reader_screen.dart:832:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildTweensReader' starts with an underscore • lib/screens/story_reader_screen.dart:885:10 • no_leading_underscores_for_local_identifiers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:901:39 • deprecated_member_use
+  error • Local variable '_buildChoicePortal' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:943:29 • referenced_before_declaration
+  error • Local variable '_buildTweensContent' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:949:29 • referenced_before_declaration
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/story_reader_screen.dart:955:41 • deprecated_member_use
+  error • Local variable '_isStoryEnd' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:972:29 • referenced_before_declaration
+  error • Local variable '_isStoryEnd' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:974:39 • referenced_before_declaration
+  error • Local variable '_isStoryEnd' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:977:33 • referenced_before_declaration
+   info • The local variable '_isStoryEnd' starts with an underscore • lib/screens/story_reader_screen.dart:994:8 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildTweensContent' starts with an underscore • lib/screens/story_reader_screen.dart:1000:10 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_buildInteractiveTweenText' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1047:17 • referenced_before_declaration
+   info • The local variable '_buildFinished' starts with an underscore • lib/screens/story_reader_screen.dart:1110:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildCover' starts with an underscore • lib/screens/story_reader_screen.dart:1148:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_cleanNavigationText' starts with an underscore • lib/screens/story_reader_screen.dart:1195:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildInteractiveTweenText' starts with an underscore • lib/screens/story_reader_screen.dart:1214:10 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_handleTweenWordTap' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1238:41 • referenced_before_declaration
+   info • The local variable '_handleTweenWordTap' starts with an underscore • lib/screens/story_reader_screen.dart:1256:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_showDefinitionDialog' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1283:11 • referenced_before_declaration
+   info • The local variable '_showDefinitionDialog' starts with an underscore • lib/screens/story_reader_screen.dart:1295:8 • no_leading_underscores_for_local_identifiers
+  error • Local variable '_buildDefSection' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1309:19 • referenced_before_declaration
+  error • Local variable '_buildDefSection' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1311:19 • referenced_before_declaration
+  error • Local variable '_buildDefSection' can't be referenced before it is declared • lib/screens/story_reader_screen.dart:1313:19 • referenced_before_declaration
+   info • The local variable '_buildDefSection' starts with an underscore • lib/screens/story_reader_screen.dart:1337:10 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_buildChoicePortal' starts with an underscore • lib/screens/story_reader_screen.dart:1353:10 • no_leading_underscores_for_local_identifiers
+   info • Unnecessary use of 'toList' in a spread • lib/screens/story_reader_screen.dart:1413:14 • unnecessary_to_list_in_spreads
+  error • Expected to find '}' • lib/screens/story_reader_screen.dart:1424:1 • expected_token
+   info • The imported package 'path' isn't a dependency of the importing package • lib/services/gemini_service.dart:10:8 • depend_on_referenced_packages
+   info • The constant name 'STORY_TEMPLATE' isn't a lowerCamelCase identifier • lib/story_prompts/templates.dart:1:14 • constant_identifier_names
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/theme/design_tokens.dart:29:49 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/utils/story_parser.dart:65:7 • curly_braces_in_flow_control_structures
+   info • Don't invoke 'print' in production code • list_models.dart:9:5 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:22:5 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:26:3 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:37:7 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:39:9 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:42:7 • avoid_print
+   info • Don't invoke 'print' in production code • list_models.dart:45:5 • avoid_print
+

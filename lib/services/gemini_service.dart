@@ -19,7 +19,7 @@ class GeminiService {
   // Uncomment the line you wish to use.
   // static const String _mainModel = 'gemini-1.5-pro'; // Standard Pro model
   // static const String _mainModel = 'gemini-3-flash-preview'; // Faster, cheaper
-  static const String _mainModel = 'gemini-1.5-pro';
+  static const String _mainModel = 'gemini-3-pro-preview';
 
   // For image generation
   static const String _imageModel = 'imagen-4.0-fast-generate-001';
