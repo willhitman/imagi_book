@@ -45,6 +45,8 @@ dependencies:
   flutter_dotenv: ^6.0.0
   http: ^1.6.0
   flutter_tts: ^4.2.5
+  connectivity_plus: ^7.0.0
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +77,18 @@ flutter:
 
   assets:
     - .env
+    - assets/default_stories/
+    - assets/story_prompts/
+    - assets/games/red_riding_hood_1/
+    - assets/games/red_riding_hood_1/assets/
+    - assets/games/hood fighter forest dash/
+    - assets/games/hood fighter forest dash/assets/
+    - assets/games/cinderella's-midnight-dash/
+    - assets/games/cinderella's-midnight-dash/assets/
+    - assets/games/pigs-vs-wolf_-wall-builder/
+    - assets/games/pigs-vs-wolf_-wall-builder/assets/
+    - assets/games/tortoise and hare 2/
+    - assets/games/tortoise and hare 2/assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

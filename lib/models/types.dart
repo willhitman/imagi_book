@@ -2,24 +2,43 @@ enum AgeGroup { KIDS, TWEENS }
 
 enum Genre { FAIRY, SCIFI, MYSTERY, ADVENTURE }
 
-enum GameType { MATCHING, RUNNER, PUZZLE, BATTLE, SCIENCE, SUGGESTION }
+enum GameType { SUGGESTION }
 
 enum ChoicePath { CLASSICAL, SHADOW, ENCHANTED }
 
 enum AppView { LIBRARY, READER }
 
+class StoryChoice {
+  final String text;
+  final int targetPage;
+
+  StoryChoice({required this.text, required this.targetPage});
+
+  factory StoryChoice.fromJson(Map<String, dynamic> json) {
+    return StoryChoice(
+      text: json['text'] ?? '',
+      targetPage: json['targetPage'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'text': text, 'targetPage': targetPage};
+}
+
 class StoryPage {
   final String text;
   final String imagePrompt;
-  String?
-  videoUrl; // Using this field name to match React, but will store image URL/data
+  String? videoUrl; // Still used for temporary/network URLs or as fallback
+  String? imagePath; // Local file path for persistent caching
   bool isGenerating;
+  final List<StoryChoice>? choices;
 
   StoryPage({
     required this.text,
     required this.imagePrompt,
     this.videoUrl,
+    this.imagePath,
     this.isGenerating = false,
+    this.choices,
   });
 
   factory StoryPage.fromJson(Map<String, dynamic> json) {
@@ -27,7 +46,12 @@ class StoryPage {
       text: json['text'] ?? '',
       imagePrompt: json['imagePrompt'] ?? '',
       videoUrl: json['videoUrl'],
+      imagePath: json['imagePath'],
       isGenerating: json['isGenerating'] ?? false,
+      choices:
+          (json['choices'] as List?)
+              ?.map((c) => StoryChoice.fromJson(c))
+              .toList(),
     );
   }
 
@@ -36,7 +60,9 @@ class StoryPage {
       'text': text,
       'imagePrompt': imagePrompt,
       'videoUrl': videoUrl,
+      'imagePath': imagePath,
       'isGenerating': isGenerating,
+      if (choices != null) 'choices': choices!.map((c) => c.toJson()).toList(),
     };
   }
 }
@@ -66,7 +92,7 @@ class GameChoice {
   };
 }
 
-class GameChallenge {
+class StoryChallenge {
   final String id;
   final String prompt;
   final List<GameChoice> choices;
@@ -74,7 +100,7 @@ class GameChallenge {
   final String hint;
   final Map<String, dynamic>? config;
 
-  GameChallenge({
+  StoryChallenge({
     required this.id,
     required this.prompt,
     required this.choices,
@@ -83,8 +109,8 @@ class GameChallenge {
     this.config,
   });
 
-  factory GameChallenge.fromJson(Map<String, dynamic> json) {
-    return GameChallenge(
+  factory StoryChallenge.fromJson(Map<String, dynamic> json) {
+    return StoryChallenge(
       id: json['id'] ?? '',
       prompt: json['prompt'] ?? '',
       choices:
@@ -119,6 +145,8 @@ class Story {
   final AgeGroup ageGroup;
   final bool isComplete;
   final Genre genre;
+  final String? gamePath;
+  final List<String>? gamePaths;
 
   Story({
     required this.id,
@@ -128,6 +156,8 @@ class Story {
     required this.ageGroup,
     this.isComplete = false,
     required this.genre,
+    this.gamePath,
+    this.gamePaths,
   });
 
   factory Story.fromJson(Map<String, dynamic> json) {
@@ -143,6 +173,8 @@ class Story {
       ageGroup: AgeGroup.values.firstWhere((e) => e.name == json['ageGroup']),
       isComplete: json['isComplete'] ?? false,
       genre: Genre.values.firstWhere((e) => e.name == json['genre']),
+      gamePath: json['gamePath'],
+      gamePaths: (json['gamePaths'] as List?)?.map((e) => e as String).toList(),
     );
   }
 
@@ -154,5 +186,7 @@ class Story {
     'ageGroup': ageGroup.name,
     'isComplete': isComplete,
     'genre': genre.name,
+    'gamePath': gamePath,
+    'gamePaths': gamePaths,
   };
 }

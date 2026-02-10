@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'
+    show rootBundle; // Added for asset loading
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import '../services/storage_service.dart';
 
+import 'package:flutter_animate/flutter_animate.dart'; // Re-added
 import '../models/types.dart';
 import '../services/gemini_service.dart';
-import '../theme/design_tokens.dart'; // Import tokens
+import '../theme/design_tokens.dart';
 import 'story_reader_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -19,48 +21,8 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
   List<Story> stories = [];
-  bool isSeeding = false;
-  double seedProgress = 0;
-  String seedStatus = "";
-
-  final List<Map<String, dynamic>> preDefinedTitles = [
-    {
-      "title": "Cinderella",
-      "age": AgeGroup.KIDS,
-      "genre": Genre.FAIRY,
-      "color": Colors.pinkAccent,
-    },
-    {
-      "title": "Jack and the Beanstalk",
-      "age": AgeGroup.KIDS,
-      "genre": Genre.FAIRY,
-      "color": Colors.green,
-    },
-    {
-      "title": "The Three Little Pigs",
-      "age": AgeGroup.KIDS,
-      "genre": Genre.FAIRY,
-      "color": Colors.amber,
-    },
-    {
-      "title": "Little Red Riding Hood",
-      "age": AgeGroup.KIDS,
-      "genre": Genre.FAIRY,
-      "color": Colors.blue,
-    },
-    {
-      "title": "The Whispering Vault",
-      "age": AgeGroup.TWEENS,
-      "genre": Genre.MYSTERY,
-      "color": Colors.blueGrey,
-    },
-    {
-      "title": "Project Chimera: Neon Breach",
-      "age": AgeGroup.TWEENS,
-      "genre": Genre.SCIFI,
-      "color": Colors.indigo,
-    },
-  ];
+  bool isCreating = false;
+  final StorageService _storageService = StorageService();
 
   @override
   void initState() {
@@ -69,165 +31,241 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 
   Future<void> _loadLibrary() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('storyspark_library_v2');
-    if (saved != null) {
-      final List<dynamic> jsonList = jsonDecode(saved);
+    final loadedStories = await _storageService.loadLibrary();
+    if (loadedStories.isNotEmpty) {
       setState(() {
-        stories = jsonList.map((e) => Story.fromJson(e)).toList();
+        stories = loadedStories;
       });
     } else {
-      _seedLibrary();
+      _loadDefaultStories();
     }
   }
 
-  Future<void> _seedLibrary() async {
-    setState(() {
-      isSeeding = true;
-      seedProgress = 0;
-    });
-
-    final newLibrary = <Story>[];
-    final geminiService = Provider.of<GeminiService>(context, listen: false);
-
+  Future<void> _loadDefaultStories() async {
     try {
-      for (int i = 0; i < preDefinedTitles.length; i++) {
-        final item = preDefinedTitles[i];
-        setState(() {
-          seedProgress = (i / preDefinedTitles.length);
-          seedStatus = 'Writing "${item["title"]}"...';
-        });
-
-        // Generate story text
-        // In a real scenario we'd probably want to catch individual failures
-        try {
-          final pages = await geminiService.generateStorySegment(
-            item["title"] as String,
-            item["age"] as AgeGroup,
-            1,
-            5,
-          );
-
-          final newStory = Story(
-            id: '${DateTime.now().millisecondsSinceEpoch}-$i',
-            title: item["title"] as String,
-            pages: pages,
-            coverColor: (item["color"] as Color).value.toRadixString(
-              16,
-            ), // Store as hex string or handle differently in model
-            ageGroup: item["age"] as AgeGroup,
-            isComplete: item["age"] == AgeGroup.KIDS,
-            genre: item["genre"] as Genre,
-          );
-          newLibrary.add(newStory);
-        } catch (e) {
-          debugPrint('Failed to generate ${item["title"]}: $e');
-        }
-      }
-
-      setState(() {
-        stories = newLibrary;
-        seedProgress = 1.0;
-        seedStatus = "Library Ready!";
-      });
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        'storyspark_library_v2',
-        jsonEncode(newLibrary.map((e) => e.toJson()).toList()),
+      final String jsonString = await rootBundle.loadString(
+        'assets/default_stories/stories.json',
       );
+      final List<dynamic> jsonList = jsonDecode(jsonString);
+      final defaultStories = jsonList.map((e) => Story.fromJson(e)).toList();
 
-      await Future.delayed(const Duration(seconds: 1));
       setState(() {
-        isSeeding = false;
+        stories = defaultStories;
       });
-    } catch (error) {
-      setState(() {
-        seedStatus = "Error building library. Refresh to retry.";
-      });
+
+      _saveLibrary(defaultStories);
+    } catch (e) {
+      debugPrint("Error loading default stories: $e");
     }
+  }
+
+  Future<void> _saveLibrary(List<Story> newLibrary) async {
+    await _storageService.saveLibrary(newLibrary);
   }
 
   void _resetLibrary() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('storyspark_library_v2');
-    _loadLibrary(); // Reload/reseed
+    await _storageService.clearLibrary();
+    _loadLibrary();
   }
 
   Color _getColorFromHex(String hexColor) {
-    // Trying to parse React's bg styling or stored hex
-    // The model logic stored it as hex above, but the React code uses tailwind classes (bg-kid-pink).
-    // Since we stored Color.value.toRadixString(16) in _seedLibrary, we can parse it back.
-    // But pre-existing library might have tailwind strings if we were migrating data (which we aren't, fresh app).
-    // Wait, in _seedLibrary I stored `(item["color"] as Color).value.toRadixString(16)`.
-    // So I should parse that.
     try {
-      return Color(int.parse(hexColor, radix: 16));
+      // Handle "FFFF4081" (no 0x) or "0xFFFF4081"
+      String cleanHex = hexColor.replaceAll("0x", "");
+      if (cleanHex.length == 6) {
+        cleanHex = "FF$cleanHex";
+      }
+      return Color(int.parse(cleanHex, radix: 16));
     } catch (e) {
       return Colors.grey;
     }
   }
 
+  void _showCreateDialog() {
+    final titleController = TextEditingController();
+    AgeGroup selectedAge = AgeGroup.KIDS;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "New Adventure",
+                      style: GoogleFonts.comicNeue(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        labelText: "What's the story about?",
+                        hintText: "e.g., A magical robot cat",
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Fixed the Row overflow issue
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "For:",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: const Text("Kids (5-8)"),
+                              selected: selectedAge == AgeGroup.KIDS,
+                              onSelected: (b) {
+                                if (b) {
+                                  setDialogState(
+                                        () => selectedAge = AgeGroup.KIDS,
+                                  );
+                                }
+                              },
+                            ),
+                            ChoiceChip(
+                              label: const Text("Tweens (9+)"),
+                              selected: selectedAge == AgeGroup.TWEENS,
+                              onSelected: (b) {
+                                if (b) {
+                                  setDialogState(
+                                        () => selectedAge = AgeGroup.TWEENS,
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text("Cancel"),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (titleController.text.trim().isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Please enter a story description"),
+                                ),
+                              );
+                              return;
+                            }
+                            Navigator.pop(ctx);
+                            _generateNewStory(
+                              titleController.text.trim(),
+                              selectedAge,
+                            );
+                          },
+                          child: const Text("Create!"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _generateNewStory(String title, AgeGroup ageGroup) async {
+    if (title.isEmpty) return;
+
+    setState(() {
+      isCreating = true;
+    });
+
+    try {
+      final geminiService = Provider.of<GeminiService>(context, listen: false);
+      final count =
+      ageGroup == AgeGroup.KIDS ? 8 : 12; // 8 for Kids, 12 for Tweens
+      final pages = await geminiService.generateStorySegment(
+        title,
+        ageGroup,
+        1,
+        count,
+      );
+
+      final newStory = Story(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        pages: pages,
+        // Assign a random color
+        coverColor: Colors
+            .primaries[stories.length % Colors.primaries.length]
+            .value
+            .toRadixString(16),
+        ageGroup: ageGroup,
+        isComplete: ageGroup == AgeGroup.TWEENS,
+        genre: ageGroup == AgeGroup.TWEENS
+            ? Genre.SCIFI
+            : Genre.FAIRY, // Basic guesstimate
+      );
+
+      final newLibrary = [...stories, newStory];
+      setState(() {
+        stories = newLibrary;
+        isCreating = false;
+      });
+
+      _saveLibrary(newLibrary);
+    } catch (e) {
+      debugPrint("Generation failed: $e");
+      setState(() {
+        isCreating = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to create story: $e")),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (isSeeding) {
-      return Scaffold(
-        backgroundColor: const Color(0xFF0F172A), // slate-900
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.auto_stories, size: 80, color: Colors.blueAccent)
-                  .animate(onPlay: (c) => c.repeat(reverse: true))
-                  .fade(duration: 1.seconds),
-              const SizedBox(height: 32),
-              const Text(
-                "Unlocking Portals",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Comic Neue',
-                ),
-              ),
-              const Text(
-                "Writing 6 stories for your offline vault...",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontFamily: 'Comic Neue',
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: 300,
-                child: LinearProgressIndicator(
-                  value: seedProgress,
-                  backgroundColor: Colors.blueGrey[800],
-                  color: Colors.blueAccent,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                seedStatus,
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).animate().fadeIn(),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       body: Stack(
         children: [
-          // Parchment background layer
+          // Parchment background
           Container(decoration: AppDecorations.parchmentBackground),
-          // Vignette overlay
+          // Vignette
           Positioned.fill(
             child: IgnorePointer(
               child: Container(decoration: AppDecorations.vignette),
@@ -247,39 +285,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     ),
                     children: const [
                       TextSpan(
-                        text: 'Story',
+                        text: 'Imagi',
                         style: TextStyle(color: AppColors.kidBlue),
                       ),
                       TextSpan(
-                        text: 'Spark',
+                        text: 'Book',
                         style: TextStyle(color: AppColors.kidYellow),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.white.withOpacity(0.5)),
-                  ),
-                  child: const Text(
-                    '4 Classics & 2 Mysterious Adventures',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
 
-                // Grid
+                // Library Grid
                 Expanded(
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -297,16 +314,21 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       child: GridView.builder(
                         padding: const EdgeInsets.all(24),
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.75,
-                              crossAxisSpacing: 24,
-                              mainAxisSpacing: 24,
-                            ),
-                        itemCount: stories.length,
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                        ),
+                        // +1 for the "Create New" button
+                        itemCount: stories.length + 1,
                         itemBuilder: (ctx, i) {
-                          final story = stories[i];
-                          return _buildStoryCard(context, story);
+                          if (i < stories.length) {
+                            final story = stories[i];
+                            return _buildStoryCard(context, story);
+                          } else {
+                            return _buildCreateCard(context);
+                          }
                         },
                       ),
                     ),
@@ -433,6 +455,70 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ],
         ),
       ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack),
+    );
+  }
+
+  Widget _buildCreateCard(BuildContext context) {
+    return GestureDetector(
+      onTap: isCreating ? null : _showCreateDialog,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Colors.blueAccent.withOpacity(0.5),
+            width: 3,
+          ),
+        ),
+        child: isCreating
+            ? const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                "Weaving Magic...",
+                style: TextStyle(
+                  fontFamily: 'Comic Neue',
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        )
+            : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.5),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.auto_awesome,
+                size: 48,
+                color: Colors.amber,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "New Enchanted Tale",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.comicNeue(
+                color: Colors.black87,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ).animate().scale(
+        duration: 300.ms,
+        curve: Curves.easeOutBack,
+        delay: 100.ms,
+      ),
     );
   }
 }

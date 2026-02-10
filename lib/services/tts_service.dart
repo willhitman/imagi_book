@@ -1,5 +1,6 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 class TTSService {
   final FlutterTts flutterTts = FlutterTts();
@@ -9,6 +10,9 @@ class TTSService {
   double volume = 1.0;
 
   bool isPlaying = false;
+
+  final _currentWordStart = StreamController<int>.broadcast();
+  Stream<int> get currentWordStartStream => _currentWordStart.stream;
 
   TTSService() {
     _initTts();
@@ -33,6 +37,15 @@ class TTSService {
     flutterTts.setErrorHandler((msg) {
       isPlaying = false;
       debugPrint("TTS Error: $msg");
+    });
+
+    flutterTts.setProgressHandler((
+      String text,
+      int start,
+      int end,
+      String word,
+    ) {
+      _currentWordStart.add(start);
     });
   }
 
@@ -68,5 +81,10 @@ class TTSService {
   Future<void> setVolume(double newVolume) async {
     volume = newVolume;
     await flutterTts.setVolume(volume);
+  }
+
+  void dispose() {
+    _currentWordStart.close();
+    flutterTts.stop();
   }
 }
