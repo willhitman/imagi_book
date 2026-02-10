@@ -13,6 +13,9 @@ import '../services/tts_service.dart';
 import '../widgets/story_choice_widget.dart';
 import '../theme/design_tokens.dart';
 import 'game_screen.dart';
+import 'dart:io';
+import '../services/image_cache_service.dart';
+import '../services/storage_service.dart';
 
 class StoryReaderScreen extends StatefulWidget {
   final Story story;
@@ -48,8 +51,9 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   // Services
   late TTSService _ttsService;
-  final AudioPlayer _audioPlayer =
-      AudioPlayer(); // Keep for legacy/sound effects if needed
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  final ImageCacheService _imageCacheService = ImageCacheService();
+  final StorageService _storageService = StorageService();
 
   @override
   void initState() {
@@ -102,6 +106,19 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
 
   void _checkAndGenerateImage() async {
     if (!_canRevealImage()) return;
+
+    // Check if we already have a generated image (URL or Path)
+    // If we have a path, check if file exists.
+    if (story.pages[currentPageIndex].imagePath != null) {
+      final file = File(story.pages[currentPageIndex].imagePath!);
+      if (await file.exists()) {
+        debugPrint(
+          "Image already cached at: ${story.pages[currentPageIndex].imagePath}",
+        );
+        return; // Already have a valid image
+      }
+    }
+
     final shouldGenerateKids =
         story.ageGroup == AgeGroup.KIDS &&
         currentPage.videoUrl == null &&
@@ -120,6 +137,27 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
       });
 
       try {
+        // 1. Check cache first before hitting API
+        final cachedPath = await _imageCacheService.getImagePath(
+          story.id,
+          currentPageIndex,
+        );
+
+        if (cachedPath != null) {
+          debugPrint("Cache HIT for page $currentPageIndex");
+          if (mounted) {
+            setState(() {
+              story.pages[currentPageIndex].imagePath = cachedPath;
+              story.pages[currentPageIndex].isGenerating = false;
+            });
+            // Update story in storage to reflect found cache
+            _updateStoryStorage();
+          }
+          return;
+        }
+
+        debugPrint("Cache MISS for page $currentPageIndex. Generating...");
+
         final geminiService = Provider.of<GeminiService>(
           context,
           listen: false,
@@ -128,16 +166,42 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
           currentPage.imagePrompt,
         );
 
+        // 2. Save to cache
+        String? newPath;
+        if (imgUrl.startsWith('data:')) {
+          newPath = await _imageCacheService.saveImage(
+            imgUrl,
+            story.id,
+            currentPageIndex,
+          );
+        }
+
         if (mounted) {
           setState(() {
-            story.pages[currentPageIndex].videoUrl = imgUrl;
+            story.pages[currentPageIndex].videoUrl =
+                imgUrl; // Keep for immediate display fallback
+            story.pages[currentPageIndex].imagePath = newPath;
             story.pages[currentPageIndex].isGenerating = false;
           });
+
+          // 3. Persist updated story
+          _updateStoryStorage();
         }
       } catch (e) {
         if (mounted)
           setState(() => story.pages[currentPageIndex].isGenerating = false);
       }
+    }
+  }
+
+  Future<void> _updateStoryStorage() async {
+    // Load current library, replace this story, and save back.
+    // This is a bit inefficient for large libraries, but safe.
+    final currentLib = await _storageService.loadLibrary();
+    final index = currentLib.indexWhere((s) => s.id == story.id);
+    if (index != -1) {
+      currentLib[index] = story;
+      await _storageService.saveLibrary(currentLib);
     }
   }
 
@@ -761,6 +825,30 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
   }
 
   Widget _buildVisualContainer() {
+    ImageProvider? imageProvider;
+
+    if (currentPage.imagePath != null) {
+      final file = File(currentPage.imagePath!);
+      if (file.existsSync()) {
+        imageProvider = FileImage(file);
+      }
+    }
+
+    // Fallback to videoUrl if no local file
+    if (imageProvider == null && currentPage.videoUrl != null) {
+      if (currentPage.videoUrl!.startsWith('data:')) {
+        try {
+          imageProvider = MemoryImage(
+            base64Decode(currentPage.videoUrl!.split(',')[1]),
+          );
+        } catch (e) {
+          /* ignore */
+        }
+      } else {
+        imageProvider = NetworkImage(currentPage.videoUrl!);
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -771,24 +859,14 @@ class _StoryReaderScreenState extends State<StoryReaderScreen> {
       child:
           currentPage.isGenerating
               ? const Center(child: CircularProgressIndicator())
-              : currentPage.videoUrl != null
-              ? currentPage.videoUrl!.startsWith('data:')
-                  ? Image.memory(
-                    base64Decode(currentPage.videoUrl!.split(',')[1]),
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (context, error, stackTrace) => const Center(
-                          child: Icon(Icons.broken_image, size: 40),
-                        ),
-                  )
-                  : Image.network(
-                    currentPage.videoUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (context, error, stackTrace) => const Center(
-                          child: Icon(Icons.broken_image, size: 40),
-                        ),
-                  )
+              : imageProvider != null
+              ? Image(
+                image: imageProvider,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        const Center(child: Icon(Icons.broken_image, size: 40)),
+              )
               : const Center(
                 child: Icon(Icons.auto_stories, size: 60, color: Colors.grey),
               ),

@@ -27,7 +27,8 @@ class StoryChoice {
 class StoryPage {
   final String text;
   final String imagePrompt;
-  String? videoUrl;
+  String? videoUrl; // Still used for temporary/network URLs or as fallback
+  String? imagePath; // Local file path for persistent caching
   bool isGenerating;
   final List<StoryChoice>? choices;
 
@@ -35,6 +36,7 @@ class StoryPage {
     required this.text,
     required this.imagePrompt,
     this.videoUrl,
+    this.imagePath,
     this.isGenerating = false,
     this.choices,
   });
@@ -44,6 +46,7 @@ class StoryPage {
       text: json['text'] ?? '',
       imagePrompt: json['imagePrompt'] ?? '',
       videoUrl: json['videoUrl'],
+      imagePath: json['imagePath'],
       isGenerating: json['isGenerating'] ?? false,
       choices:
           (json['choices'] as List?)
@@ -57,6 +60,7 @@ class StoryPage {
       'text': text,
       'imagePrompt': imagePrompt,
       'videoUrl': videoUrl,
+      'imagePath': imagePath,
       'isGenerating': isGenerating,
       if (choices != null) 'choices': choices!.map((c) => c.toJson()).toList(),
     };
